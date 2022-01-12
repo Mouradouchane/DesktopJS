@@ -1,2 +1,2 @@
-# GUI.js
-library for building GUI's
+## virtualOS
+library for building UI's
