@@ -1,9 +1,27 @@
+import {window} from "./window.js";
 
-export class os{
+export class virtualOS{
 
-    constructor(window_html_obj = {} , window_css_obj = {}){
+    constructor(){
 
-        this.current = {};
+        this.env = {
+
+            logs : {
+                title : "[VOS] ",
+            },
+
+            desktop : { },
+
+            templates : {
+
+                window : {
+                    html : null ,
+                    css  : null ,
+                }
+
+            }
+
+        }
 
         this.add = {
 
@@ -11,66 +29,72 @@ export class os{
                 console.warn("working...");
             },
 
-        }
+        },
 
-        this.env = {
+        this.set = {
+            
+            templateToHTML : (str) => {
+                try{
+                    let parser = new DOMParser();
+                    let html = parser.parseFromString(str, 'text/html');
+                    
+                    return html.body.firstElementChild;
+                }
+                catch(err) {
+                    console.error(this.env.logs.title + "parsing html : " , err);
+                    throw null;
+                }
+            },
 
-            templates : {
-                
-                templateToHTML : (str) => {
+            window : {
+
+                css : (css_style_as_string = "") =>{
                     try{
-                        let parser = new DOMParser();
-                        let html = parser.parseFromString(str, 'text/html');
+                        let styleElement = document.querySelector("#window_style") || document.createElement("style"); 
                         
-                        return html;
+                        if(styleElement.id != "window_style") {
+                            styleElement.id = "window_style";
+                            console.warn(this.env.logs.title + "generating new style for window ...");
+                        }
+                        
+                        styleElement.textContent = css_style_as_string;
+                        document.body.append(styleElement);
+                        
+                        this.env.templates.window.css = styleElement;
                     }
-                    catch(err) {
-                        console.error("Window Parse To HTML Error : " , err);
-                        return null;
+                    catch(err){
+                        console.error(this.env.logs.title + "set style to window error : " , err);
                     }
                 },
 
-                window : {
-                    html : null,
-                    css  : null,
-                
-                    updateHtml  : (new_html_template_as_string = "") => {
+                html : (html_template_as_string = "") => {
+                    let parsed_html = this.set.templateToHTML(html_template_as_string);
 
-                    },
+                    if(parsed_html == null){
+                        console.warn,(this.env.logs.title + "invalid template string")
+                        return false;
+                    }
 
-                    updateStyle : () => {
-                        try{
-                            let new_style = document.createElement("style");
-                            new_style.textContent = this.css;
-                            
-                            document.body.append(new_style);
-                        }
-                        catch(err) {
-                            console.error("Window Update Style Error : " , err);
-                        }
-                    },
-
-                    setStyle : (css_style_as_string = "") =>{
-                        try{
-                            this.css = css_style_as_string
-                            this.env.templates.window.updateStyle();
-                        }
-                        catch(err){
-                            console.error("Window Set Style Error : " , err);
-                        }
-                    },
-
-                    setHtml : (html_template_as_string = "") => {
-                        this.env.templates.templateToHTML(html_template_as_string);
-
-                    },
+                    this.env.templates.window.html = parsed_html;
+                    document.body.append( this.env.templates.window.html )
+                    return true;
                 },
 
-                taskbar : {
-                    html : null,
-                    css  : null
+            }
+
+        }
+        
+        this.get = {
+
+            window : {
+                html : () => {
+
+                },
+                css : () => {
+                    
                 }
             }
+
         }
     }
 

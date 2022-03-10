@@ -19,12 +19,4 @@ export class window{
         this.template = null;
     }
 
-    constructor(attrs_object = {}){
-
-        for(let attr of attrs_object){
-            this[attr] = attrs_object[attr];
-        }
-        
-        this.template = null;
-    }
 }
