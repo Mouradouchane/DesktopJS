@@ -4,14 +4,30 @@ export class virtualOS{
 
     constructor(){
 
+        // ENV object like sitting in apps games os 
+        // ENV where we controll variables like icons size & ...
         this.env = {
 
+            // object for library log messagaes errors ...
             logs : {
+                // title should be in any log comming from library
                 title : "[VOS] ",
+
+                // all messages about errors
+                errors : {
+
+                },
+
+                // all messages about helps
+                helps : {
+
+                }
             },
 
+            // where all desktop variables get stored for usage
             desktop : { },
 
+            // where all templates get stored for usage
             templates : {
 
                 window : {
@@ -23,77 +39,94 @@ export class virtualOS{
 
         }
 
+        // object responsible for adding new object the OS stuff like => window,notification,files,...
         this.add = {
 
             window : () => {
+                // ***need to be constructed soon***
                 console.warn("working...");
             },
 
         },
 
+        // object responsible for any changes in any html & css template
         this.set = {
-            
-            templateToHTML : (str) => {
-                try{
+            // function convert STRING TEMPLATE to HTML 
+            template_to_HTML : (str) => {
+                
+                try{ // convert
                     let parser = new DOMParser();
                     let html = parser.parseFromString(str, 'text/html');
-                    
+                    // first Elements it's main element it's self
                     return html.body.firstElementChild;
                 }
-                catch(err) {
+                catch(err) { // in case any error happen 
                     console.error(this.env.logs.title + "parsing html : " , err);
                     throw null;
                 }
             },
 
+            // window object for set HTML/CSS templates
             window : {
 
+                // set css template for window
+                // css_style_as_string => css for the hole window and all of it's children 
                 css : (css_style_as_string = "") =>{
                     try{
+                        // if there's no style make a new one 
                         let styleElement = document.querySelector("#window_style") || document.createElement("style"); 
-                        
+                        // set id if there's no id
                         if(styleElement.id != "window_style") {
                             styleElement.id = "window_style";
                             console.warn(this.env.logs.title + "generating new style for window ...");
                         }
-                        
+
+                        // set new style to the DOM & ENV
                         styleElement.textContent = css_style_as_string;
                         document.body.append(styleElement);
-                        
                         this.env.templates.window.css = styleElement;
+
+                        return true;
                     }
                     catch(err){
-                        console.error(this.env.logs.title + "set style to window error : " , err);
+                        console.error(this.env.logs.title + "set style for window tempaltes error : " , err);
+                        return false;
                     }
                 },
 
+                // set html template for window
+                // html_template_as_string : template string contain all 
                 html : (html_template_as_string = "") => {
-                    let parsed_html = this.set.templateToHTML(html_template_as_string);
 
+                    // parse string to html using "template_to_HTML" function
+                    let parsed_html = this.set.template_to_HTML(html_template_as_string);
+
+                    // if template_to_HTML function throw null that mean error happend in parsing
                     if(parsed_html == null){
-                        console.warn,(this.env.logs.title + "invalid template string")
+                        console.warn,(this.env.logs.title + "possible something went wrong while parsing")
                         return false;
                     }
-
+                    // set new template to ENV
                     this.env.templates.window.html = parsed_html;
-                    document.body.append( this.env.templates.window.html )
                     return true;
                 },
 
             }
 
         }
-        
+
+        // object provide all elements "html & css" parts  
         this.get = {
 
+            // get window HTML template & css <style> 
             window : {
                 html : () => {
-
+                    return this.env.templates.window.html;
                 },
                 css : () => {
-                    
+                    return this.env.templates.window.css; 
                 }
-            }
+            },
 
         }
     }
