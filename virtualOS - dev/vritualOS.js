@@ -54,13 +54,12 @@ export class virtualOS{
             // add new window
             window : ( // needed args
                 id = "def" , title = "window" , x = 10, y = 10 , height = 512, width = 512 , 
-                focus = true , maximise_button = true , minimise_button = true , 
-                visible = true
+                focus = true , maximise_button = true , minimise_button = true , visible = true
             ) => {
                 // if this id is not defined yet 
                 if(this.running.windows[id] == undefined || this.running.windows[id] == null){
                     // define this new window to running object
-                    this.running.windows[id] = new window(id,title,x,y,height,width,focus,maximise_button,minimise_button,visible);
+                    this.running.windows[id] = new window(title,x,y,height,width,focus,maximise_button,minimise_button,visible);
                     // then return it reference
                     return this.running.windows[id];
                 }
