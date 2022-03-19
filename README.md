@@ -13,12 +13,55 @@
 there's two versions of this library __developer__ version & __usage/min__ version choose your version & get started .
 
 #### __Developers Version__ :
+if you want to do some **development,enhancement,contributions...** , you gonna work in __developement__ folder .
+
 clone library
 
-```git clone https://github.com/Mouradouchane/DesktopJS.git```
+```
+git clone https://github.com/Mouradouchane/DesktopJS.git
+```
 
+include library to your project 
+
+import __Desktop Class__ from __Desktop.js__ in your js file
+```js
+import { desktop } from "...path/Desktop.js";
+``` 
+
+after this point you gonna be ready to start collaborating and contributing , for full details => docs/tutorial .
 
 #### __Usage Version__ :
+import __Desktop-min.js__ from __CDN__
+```js
+// min version not available yet :(
+```
 
+### Example Of Code :
+simple example for setupping window __html__/__css__ and using it
+```js
+// window html & css tempaltes
+let win_html_str = "...";
+let win_css_str  = "...";
+
+// main object
+const desktop = new desktop();
+
+// set tempaltes to the desktop object
+desktop.set.window.html( win_html_str );
+desktop.set.window.css( win_css_str  );
+
+// make new window
+let window = desktop.new.window(...new_window_args);
+
+// open and make window visible
+window.open();
+
+// set new title to this window
+window.set.title( "new title" );
+
+// check if this window is resizable or not :)
+window.is.resizable();
+
+``` 
 
 ### Contributions :
