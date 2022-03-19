@@ -43,7 +43,7 @@ export class virtualOS{
         this.running = {
 
             // this should contain all running windows 
-            windows : {
+             windows : {
                 
             }
         }
