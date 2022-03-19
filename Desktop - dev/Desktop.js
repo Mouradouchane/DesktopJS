@@ -1,17 +1,18 @@
 import {window} from "./window.js";
 
-export class virtualOS{
+
+export class desktop{
 
     constructor(){
 
-        // ENV object like sitting in apps games os 
+        // ENV object like sitting
         // ENV where we controll variables like icons size & ...
         this.env = {
 
             // object for library log messagaes errors ...
             logs : {
                 // title should be in any log comming from library
-                title : "[VOS] ",
+                title : "[DESKTOP] ",
 
                 // all messages about errors
                 errors : {
@@ -43,7 +44,7 @@ export class virtualOS{
         this.running = {
 
             // this should contain all running windows 
-             windows : {
+            windows : {
                 
             }
         }
