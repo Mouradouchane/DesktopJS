@@ -65,5 +65,5 @@ window.is.resizable();
 ``` 
 
 ### Contributions :
-your welcome this repo for everyone , open pull request and let's talk :smile:
+your welcome this repo for everyone , open [issues](https://github.com/Mouradouchane/DesktopJS/issues) and let's talk :smile:
 
