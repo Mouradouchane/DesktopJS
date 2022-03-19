@@ -7,6 +7,13 @@
 
 
 ### About :
+library for building virtual desktop environment on the web
+
+benefits :
+* simple 
+* comprehensive
+* easy to use
+* open-source 
 
 ### Get Started :
 
