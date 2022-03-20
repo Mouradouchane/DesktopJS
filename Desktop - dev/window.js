@@ -1,88 +1,40 @@
+// for inherit global properties
+import { global_element } from "./global_element.js";
 
-export class window{
+export class window extends global_element{
     // === private properties ===
-    #x;
-    #y;
-    #height;
-    #width;
     #maximise;
     #minimise;
-    #visible;
     #focus;
 
+    // function take template & split it to parts for controll each part
     #setup_template = (html_template) => {
-        console.log("working");
+        // *** need construction ***
+        console.warn("need construction");
     }
 
     constructor(
         title = "window" , x = 10, y = 10 , height = 512, width = 512 , 
         focus = true , maximise_button = true , minimise_button = true , 
-        visible = true
+        visible = true , html_template = null 
     ){
-        // === public properties ===
-        this.title = title ;
-
-        // check & set new values to the private properties
-        this.#x = (typeof(x) == "number") ? x : 0; 
-        this.#y = (typeof(y) == "number") ? y : 0;
-        this.#height = (typeof(height) == "number") ? height : 0;
-        this.#width  = (typeof(width) == "number") ? width : 0;
+        // set values to the inherited properties
+        super(x,y,height,width,title,null,visible);
+ 
         this.#focus  = (typeof(focus) == "boolean") ? focus : true; 
         this.#maximise = (typeof(maximise_button) == "boolean") ? maximise_button : true;
         this.#minimise = (typeof(minimise_button) == "boolean") ? minimise_button : true;
-        this.#visible  = (typeof(visible) == "boolean") ? visible : true;
 
-        // object contain all abilities for setting new values
-        this.set = {
+        
+        // GET function
 
-            // set new x value only if "new_x" valid number
-            x : ( new_x = 0) => {
-                // check
-                if( typeof(new_x) == "number"){
-                    this.#x =  new_x; // set new value if it valid
-                    return true; // return confirmation :)
-                }
-                else { // mean invalid value
-                    console.warn("[VOS] new_x must be number")
-                    return false; // return confirmation :(
-                }
-            },
-            // like x() function
-            y : ( new_y = 0 ) => {
-                if( typeof(new_y) == "number"){
-                    this.#y = new_y;
-                    return true;
-                }
-                else {
-                    console.warn("[VOS] new_y must be number")
-                    return false;
-                }
-            },
+        // SET function
 
-            // set multiple values at sametime 
-            /* 
-            example : 
-                {
-                    x : 10 ,
-                    y : 20 ,
-                    blur : true
-                }
-            */ 
-            values : ( new_values = {} ) => {
-                /* function need work :) */
-            }
-        }
+        // DOM function
 
-        // object full of functions who provides all possible needed values
-        this.get = {
-            x : () => {
-                return this.#x;
-            },
-
-            y : () => {
-                return this.#y;
-            }
-        }
+        // ON  function
+        
+        // IS  function
 
     }
 

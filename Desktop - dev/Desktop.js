@@ -50,7 +50,7 @@ export class desktop{
         }
         
         // object responsible for adding new object the OS stuff like => window,notification,files,...
-        this.add = {
+        this.new = {
 
             // add new window
             window : ( // needed args
@@ -152,6 +152,7 @@ export class desktop{
             },
 
         }
+
     }
 
 }
