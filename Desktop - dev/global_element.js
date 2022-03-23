@@ -37,7 +37,7 @@ export class global_element{
                     return true; // return confirmation :)
                 }
                 else { // mean invalid value
-                    console.warn("[DESKTOPjs] new_x must be number")
+                    console.warn("[DESKTOPjs] new_x parameter must be number")
                     return false; // return confirmation :(
                 }
             },
@@ -48,7 +48,7 @@ export class global_element{
                     return true;
                 }
                 else {
-                    console.warn("[DESKTOPjs] new_y must be number");
+                    console.warn("[DESKTOPjs] new_y parameter must be number");
                     return false;
                 }
             },
@@ -76,7 +76,19 @@ export class global_element{
 
             y : () => {
                 return this.#y;
-            }
+            },
+
+            id : () => {
+                return this.#id;
+            },
+
+            width : () => {
+                return this.#width;
+            },
+
+            height : () => {
+                return this.#height;
+            },
         }
 
         // object provides and contain HTML elements of this object
