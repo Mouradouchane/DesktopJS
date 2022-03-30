@@ -20,7 +20,7 @@ benefits :
 there's two versions of this library __developer__ version & __usage/min__ version choose your version & get started .
 
 #### __Developers Version__ :
-if you want to do some **development,enhancement,contributions...** , you gonna work in __developement__ folder .
+if you want to do some **development,enhancement,contributions...** , you have to work in __development__ folder.
 
 clone library
 
