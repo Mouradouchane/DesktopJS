@@ -35,8 +35,7 @@ import __Desktop Class__ from __Desktop.js__ in your js file
 import { desktop } from "...path/Desktop.js";
 ``` 
 
-after this point you gonna be ready to start collaborating and contributing , for full details => docs/tutorial .
-
+after this point you gonna be ready to start collaborating and contributing , for full details [docs](https://github.com/Mouradouchane/DesktopJS/wiki) .
 #### __Usage Version__ :
 import __Desktop-min.js__ from __CDN__
 ```js
@@ -70,6 +69,9 @@ window.set.title( "new title" );
 window.is.resizable();
 
 ``` 
+
+### Documentation :
+if you want to learn more and understand more about this library you can start from here at [home](https://github.com/Mouradouchane/DesktopJS/wiki)
 
 ### Contributions :
 your welcome this repo for everyone , open [issues](https://github.com/Mouradouchane/DesktopJS/issues) and let's talk :smile:
