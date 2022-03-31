@@ -89,6 +89,11 @@ export class global_element{
             height : () => {
                 return this.#height;
             },
+
+            visible : () => {
+                return this.#visible
+            },
+            
         }
 
         // object provides and contain HTML elements of this object
