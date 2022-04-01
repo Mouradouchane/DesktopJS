@@ -6,13 +6,14 @@
 [![](https://img.shields.io/badge/version-1-red)](#)
 
 
-### About :
+### <u> About :</u>
+
 library for building virtual desktop environment on the web
 
-benefits :
-* simple 
+### <u> Benefits :</u>
+* easy-to-learn
+* easy-to-use
 * comprehensive
-* easy to use
 * open-source 
 
 ### Get Started :
@@ -71,7 +72,7 @@ window.is.resizable();
 ``` 
 
 ### Documentation :
-if you want to learn more and understand more about this library you can start from here at [home](https://github.com/Mouradouchane/DesktopJS/wiki)
+if you want to learn more and understand more about this library you can start from here at [docs](https://github.com/Mouradouchane/DesktopJS/wiki)
 
 ### Contributions :
 your welcome this repo for everyone , open [issues](https://github.com/Mouradouchane/DesktopJS/issues) and let's talk :smile:
