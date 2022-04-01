@@ -6,7 +6,7 @@
 [![](https://img.shields.io/badge/version-1-red)](#)
 
 
-### <u> About :</u>
+### About :
 
 library for building virtual desktop environment on the web
 
