@@ -18,10 +18,7 @@ library for building virtual desktop environment on the web
 
 ### Get Started :
 
-there's two versions of this library __developer__ version & __usage/min__ version choose your version & get started .
-
-#### __Developers Version__ :
-if you want to do some **development,enhancement,contributions...** , you have to work in __development__ folder.
+there's two versions of this library "__development__" and "__usage__" version , choose what you want and get started .
 
 clone library
 
@@ -36,15 +33,20 @@ import __Desktop Class__ from __Desktop.js__ in your js file
 import { desktop } from "...path/Desktop.js";
 ``` 
 
-after this point you gonna be ready to start collaborating and contributing , for full details [docs](https://github.com/Mouradouchane/DesktopJS/wiki) .
-#### __Usage Version__ :
+#### __For Development__ :
+
+- if you want to do some **development , enhancement , contributions...** , you have to work in __dev__ folder.
+- for full details [docs](https://github.com/Mouradouchane/DesktopJS/wiki) .
+
+#### __For Usage__ :
+
 import __Desktop-min.js__ from __CDN__
 ```js
 // min version not available yet :(
 ```
 
 ### Example Of Code :
-simple example for setupping window __html__/__css__ and using it
+simple example for setup window "__html__" & "__css__" and using it
 ```js
 // window html & css tempaltes
 let win_html_str = "...";
