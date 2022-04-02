@@ -3,7 +3,28 @@ import {window} from "./window.js";
 
 export class desktop{
 
-    constructor(){
+    // === private properties ===
+    #desktop_html = null;
+
+    // "desktop_html_id" we need html element , that tell us where we should work  
+    constructor( desktop_html_id = null){
+
+        // try to select target desktop
+        this.#desktop_html = document.querySelector(`#${desktop_html_id}`);
+
+        // check if desktop_html is valid or not
+        if( !(this.#desktop_html) ){
+
+            // if not
+            // default selection will be the "html body"
+            this.#desktop_html = document.body;
+
+            // log warn and help
+            console.warn("[DESKTOPjs] ",`'desktop html element id' you pass in not found or invalid , because parameter desktop_html_id is ${desktop_html_id}`);
+            console.info("[DESKTOPjs] ",`default selection will be the "html body"`);
+           
+        }
+
 
         // ENV object like sitting
         // ENV where we controll variables like icons size & ...
@@ -58,8 +79,8 @@ export class desktop{
                 // if window html template not defined yet
                 if(!this.env.templates.window.html){
                     
-                    console.error(this.env.lib.title + `error while constructing window , because window html template not defined yet `);
-                    console.hint(this.env.lib.title + `use '.set.window.html' function in desktop object to solve this problem`);
+                    console.error(this.env.lib.title + `error while constructing window , because there's no html template for windows .`);
+                    console.hint(this.env.lib.title + `use '.set.window.html' function in desktop object to solve this problem .`);
                    
                     return null;
                 }
@@ -91,7 +112,8 @@ export class desktop{
 
         // object responsible for any changes in any html & css template
         this.set = {
-            // function convert STRING TEMPLATE to HTML 
+
+            // function convert STRING TEMPLATE to HTML OBJECT
             template_to_HTML : (str) => {
                 
                 try{ // convert
