@@ -168,6 +168,9 @@ export class window{
             title : () => {
                 return this.#title;
             }
+
+		// write values function here :)
+
         }
 
 
