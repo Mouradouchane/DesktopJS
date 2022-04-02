@@ -73,7 +73,8 @@ export class desktop{
             // add new window
             window : (
                 id = "def" , title = "window" , x = 10, y = 10 , height = 512, width = 512 , 
-                focus = true , maximise_button = true , minimise_button = true , visible = true
+                focus = true , maximise_button = true , minimise_button = true , visible = true , 
+                where_to_append = null
             ) => {
 
                 // if window html template not defined yet
@@ -90,7 +91,14 @@ export class desktop{
                 if( typeof(id) == "string" && !this.running[id] ){
 
                     // define new window 
-                    this.running[id] = new window(id,title,x,y,height,width,focus,maximise_button,minimise_button,visible);
+                    this.running[id] = new window(
+                        id,title,x,y,height,width,focus,
+                        maximise_button,
+                        minimise_button,visible , 
+                        this.#desktop_html ,
+                        this.env.templates.window.html
+                    );
+                    
                     // then return it reference
                     return this.running[id];
 
