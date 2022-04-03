@@ -167,10 +167,24 @@ export class window{
         
             title : () => {
                 return this.#title;
+            },
+
+
+        /*-----------------values function---------*/
+            values : () => {
+                return {
+                    id : this.#id,
+                    x : this.#x,
+                    y : this.#y,
+                    height : this.#height,
+                    width : this.#width,
+                    visible : this.#visible,
+                    minimize : this.#minimize,
+                    maximize : this.#maximize,
+                    title : this.#title,
+                    focus : this.#focus,
+                }
             }
-
-		// write values function here :)
-
         }
 
 
