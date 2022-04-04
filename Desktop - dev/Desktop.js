@@ -70,11 +70,11 @@ export class desktop{
         // object responsible for adding new object the OS stuff like => window,notification,files,...
         this.new = {
 
-            // add new window
+            // make new window
             window : (
                 id = "def" , title = "window" , x = 10, y = 10 , height = 512, width = 512 , 
                 focus = true , maximise_button = true , minimise_button = true , visible = true , 
-                where_to_append = null
+                resize_in_horizontal = true , resize_in_vertical = true , where_to_append = null
             ) => {
 
                 // if window html template not defined yet
@@ -92,9 +92,11 @@ export class desktop{
 
                     // define new window 
                     this.running[id] = new window(
-                        id,title,x,y,height,width,focus,
-                        maximise_button,
+                        id , title , x , y , height , width , focus ,
+                        maximise_button ,
                         minimise_button,visible , 
+                        resize_in_horizontal ,
+                        resize_in_vertical ,
                         this.#desktop_html ,
                         this.env.templates.window.html
                     );

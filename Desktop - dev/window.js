@@ -11,7 +11,9 @@ export class window{
     #maximize;
     #title;
     #focus;
-    
+    #resize_h;
+    #resize_w;
+
     // function take html template and processes it 
     #build = ( where_to_append , html_template ) => {
         // make window using html_template
@@ -57,6 +59,7 @@ export class window{
             this.dom.maximize.parentNode.removeChild(this.dom.maximize);
         }
 
+
         // append this new window to the desktop
         where_to_append.append(this.dom.window);
     }
@@ -64,7 +67,8 @@ export class window{
     constructor(
         id = null , title = "window" , x = 10, y = 10 , height = 512, width = 512 , 
         focus = true , maximize_button = true , minimize_button = true , 
-        visible = true , where_to_append = null , html_template = null 
+        visible = true , resize_in_horizontal = true , resize_in_vertical = true , 
+        where_to_append = null , html_template = null 
     ){
 
         // check & set new values
@@ -78,7 +82,8 @@ export class window{
         this.#focus    = (typeof(focus) == "boolean") ? focus : true; 
         this.#maximize = (typeof(maximize_button) == "boolean") ? maximize_button : true;
         this.#minimize = (typeof(minimize_button) == "boolean") ? minimize_button : true;
-
+        this.#resize_h = (typeof(resize_in_horizontal) == "boolean") ? resize_in_horizontal : true;
+        this.#resize_w = (typeof(resize_in_vertical) == "boolean") ? resize_in_vertical : true;
         
         // provide html elements of that element
         this.dom = { }
