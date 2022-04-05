@@ -78,5 +78,5 @@ window.is.resizable();
 if you want to learn more and understand more about this library you can start from here at [docs](../../wiki)
 
 ### Contributions :
-your welcome this repo is open for everyone , just before you start [text me](../../discussions) or open [issues](../../issues) and let's talk :smile:
+your welcome this repo is open for everyone , just before you start working in anything just text me first in [discussions](../../discussions) or open [issues](../../issues) 😃
 
