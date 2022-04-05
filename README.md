@@ -78,5 +78,5 @@ window.is.resizable();
 if you want to learn more and understand more about this library you can start from here at [docs](https://github.com/Mouradouchane/DesktopJS/wiki)
 
 ### Contributions :
-your welcome this repo for everyone , open [issues](https://github.com/Mouradouchane/DesktopJS/issues) and let's talk :smile:
+your welcome this repo is open for everyone , just before you start [text me](./discussions) or open [issues](https://github.com/Mouradouchane/DesktopJS/issues) and let's talk :smile:
 
