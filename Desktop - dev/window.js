@@ -59,6 +59,43 @@ export class window{
             this.dom.maximize.parentNode.removeChild(this.dom.maximize);
         }
 
+        let in_drag = false;
+        let mouse_x = 0;
+        let mouse_y = 0;
+
+        this.dom.top_bar.onmousedown = (e) => {
+            in_drag = true;
+            e.preventDefault();
+
+            mouse_x = e.clientX;
+            mouse_y = e.clientY;
+
+            console.log("mouse down at " , e.clientX , e.clientY);
+        };
+        
+        this.dom.window.onmousemove = (e) => {
+            e.preventDefault();
+            if(in_drag){
+
+                // calculate the new cursor position:
+                let new_mouse_x = mouse_x - e.clientX;
+                let new_mouse_y = mouse_y - e.clientY;
+                mouse_x = e.clientX;
+                mouse_y = e.clientY;
+                
+                // set the element's new position:
+                this.dom.window.style.top = (this.dom.window.offsetTop - new_mouse_y) + "px";
+                this.dom.window.style.left = (this.dom.window.offsetLeft - new_mouse_x) + "px";
+
+                console.warn("mouse move at " , e.clientX , e.clientY);
+            }
+        };
+
+        this.dom.top_bar.onmouseup = (e) => {
+            in_drag = false;
+            console.log("mouse up at " , e.clientX , e.clientY);
+        };
+
 
         // append this new window to the desktop
         where_to_append.append(this.dom.window);
@@ -78,12 +115,12 @@ export class window{
         this.#width     = (typeof(width) == "number") ? width : 0;
         this.#id        = (typeof(id) == "string") ? id : null;
         this.#visible   = (typeof(visible) == "boolean") ? visible : true;
-        this.#title    = (typeof(title) == "string") ? title : null;
-        this.#focus    = (typeof(focus) == "boolean") ? focus : true; 
-        this.#maximize = (typeof(maximize_button) == "boolean") ? maximize_button : true;
-        this.#minimize = (typeof(minimize_button) == "boolean") ? minimize_button : true;
-        this.#resize_h = (typeof(resize_in_horizontal) == "boolean") ? resize_in_horizontal : true;
-        this.#resize_w = (typeof(resize_in_vertical) == "boolean") ? resize_in_vertical : true;
+        this.#title     = (typeof(title) == "string") ? title : null;
+        this.#focus     = (typeof(focus) == "boolean") ? focus : true; 
+        this.#maximize  = (typeof(maximize_button) == "boolean") ? maximize_button : true;
+        this.#minimize  = (typeof(minimize_button) == "boolean") ? minimize_button : true;
+        this.#resize_h  = (typeof(resize_in_horizontal) == "boolean") ? resize_in_horizontal : true;
+        this.#resize_w  = (typeof(resize_in_vertical) == "boolean") ? resize_in_vertical : true;
         
         // provide html elements of that element
         this.dom = { }
@@ -92,7 +129,16 @@ export class window{
         this.is  = { }
 
         // object provide events 
-        this.on  = { }
+        this.on  = {
+
+            // when window dragged
+            drag : ( mouse_x , mouse_y  , call_back_function = null ) => {
+
+                this.dom.window.style.left = mouse_x - this.#x;
+                this.dom.window.style.top = mouse_y - this.#y;
+            }
+
+        }
 
         this.#build(where_to_append , html_template);
 
@@ -104,6 +150,7 @@ export class window{
                 // check
                 if( typeof(new_x) == "number"){
                     this.#x =  new_x; // set new value if it valid
+                    this.dom.window.style.left = this.#x + "px";
                     return true; // return confirmation :)
                 }
                 else { // mean invalid value
@@ -115,6 +162,7 @@ export class window{
             y : ( new_y = 0 ) => {
                 if( typeof(new_y) == "number"){
                     this.#y = new_y;
+                    this.dom.window.style.top = this.#y + "px";
                     return true;
                 }
                 else {
