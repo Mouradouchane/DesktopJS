@@ -10,7 +10,7 @@
 
 library for building virtual desktop environment on the web
 
-### <u> Benefits :</u>
+### Benefits :
 * easy-to-learn
 * easy-to-use
 * comprehensive
@@ -43,7 +43,7 @@ import { desktop } from "...path/Desktop.js";
 ``` 
 
 - if you want to do some **development , enhancement , contributions...** , you have to work in __dev__ folder.
-- for more details [docs](https://github.com/Mouradouchane/DesktopJS/wiki) .
+- for more details [docs](../../wiki) .
 
 
 ### Example Of Code :
@@ -75,7 +75,7 @@ window.is.resizable();
 ``` 
 
 ### Documentation :
-if you want to learn more and understand more about this library you can start from here at [docs](https://github.com/Mouradouchane/DesktopJS/wiki)
+if you want to learn more and understand more about this library you can start from here at [docs](../../wiki)
 
 ### Contributions :
 your welcome this repo is open for everyone , just before you start [text me](../../discussions) or open [issues](../../issues) and let's talk :smile:
