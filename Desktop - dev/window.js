@@ -14,6 +14,18 @@ export class window{
     #resize_h;
     #resize_w;
 
+    // env object private in window
+    #env = {
+        
+        // drag event : DATA
+        drag : {
+            is_window_in_drag : false,
+            call_back_function : null,
+            call_back_args : [],
+        },
+    }
+
+
     // function take html template and processes it 
     #build = ( where_to_append , html_template ) => {
         // make window using html_template
@@ -59,42 +71,41 @@ export class window{
             this.dom.maximize.parentNode.removeChild(this.dom.maximize);
         }
 
-        let in_drag = false;
-        let mouse_x = 0;
-        let mouse_y = 0;
 
-        this.dom.top_bar.onmousedown = (e) => {
-            in_drag = true;
+        // setup drag functionallity 
+        this.dom.top_bar.addEventListener("mousedown" , (e) => {
+            this.#env.drag.is_window_in_drag = true;
             e.preventDefault();
 
-            mouse_x = e.clientX;
-            mouse_y = e.clientY;
+            let mouse_x = e.clientX;
+            let mouse_y = e.clientY;
 
-            console.log("mouse down at " , e.clientX , e.clientY);
-        };
+            document.onmousemove = ( e ) => {
+                e.preventDefault();
+                if( this.#env.drag.is_window_in_drag ){
+                  
+                    // calculate the new cursor position
+                    let new_mouse_x = mouse_x - e.clientX;
+                    let new_mouse_y = mouse_y - e.clientY;
+                    mouse_x = e.clientX;
+                    mouse_y = e.clientY;
+                    
+                    // set the element's new position
+                    this.set.x(this.dom.window.offsetLeft - new_mouse_x);
+                    this.set.y(this.dom.window.offsetTop  - new_mouse_y);
+
+                    if(this.#env.drag.call_back_function){
+                        this.#env.drag.call_back_function(this , e , ...(this.#env.drag.call_back_args) )
+                    } 
+                }
+            };
+        });
         
-        this.dom.window.onmousemove = (e) => {
-            e.preventDefault();
-            if(in_drag){
 
-                // calculate the new cursor position:
-                let new_mouse_x = mouse_x - e.clientX;
-                let new_mouse_y = mouse_y - e.clientY;
-                mouse_x = e.clientX;
-                mouse_y = e.clientY;
-                
-                // set the element's new position:
-                this.dom.window.style.top = (this.dom.window.offsetTop - new_mouse_y) + "px";
-                this.dom.window.style.left = (this.dom.window.offsetLeft - new_mouse_x) + "px";
-
-                console.warn("mouse move at " , e.clientX , e.clientY);
-            }
-        };
-
-        this.dom.top_bar.onmouseup = (e) => {
-            in_drag = false;
-            console.log("mouse up at " , e.clientX , e.clientY);
-        };
+        this.dom.top_bar.addEventListener("mouseup", () => {
+            this.#env.drag.is_window_in_drag  = false;
+            document.onmousemove = null;
+        });
 
 
         // append this new window to the desktop
@@ -122,20 +133,36 @@ export class window{
         this.#resize_h  = (typeof(resize_in_horizontal) == "boolean") ? resize_in_horizontal : true;
         this.#resize_w  = (typeof(resize_in_vertical) == "boolean") ? resize_in_vertical : true;
         
+
         // provide html elements of that element
         this.dom = { }
 
         // object provide booleans represents the case of object
-        this.is  = { }
+        this.is  = { 
+            
+            // for check if this window in drag right now or not  
+            in_drag : () => {
+                return this.#env.drag.is_window_in_drag;
+            }
+        }
 
         // object provide events 
         this.on  = {
 
             // when window dragged
-            drag : ( mouse_x , mouse_y  , call_back_function = null ) => {
+            drag : (call_back_function = null , ...args ) => {
 
-                this.dom.window.style.left = mouse_x - this.#x;
-                this.dom.window.style.top = mouse_y - this.#y;
+                // call_back_function must be function
+                if(typeof(call_back_function) == "function"){
+                    
+                    // save call back function and it's arguments
+                    this.#env.drag.call_back_function = call_back_function;
+                    this.#env.drag.call_back_args = args;
+
+                }
+                else{ // mean call_back_function is not function 
+                    console.error("[DESKTOPjs] parameter 'call_back_function' must be function");
+                }
             }
 
         }
@@ -222,8 +249,7 @@ export class window{
                 return this.#title;
             },
 
-
-        /*-----------------values function---------*/
+            // function return object contain few values not everything 
             values : () => {
                 return {
                     id : this.#id,
