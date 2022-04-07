@@ -28,31 +28,95 @@ export class window{
 
     // function take html template and processes it 
     #build = ( where_to_append , html_template ) => {
-        // make window using html_template
-        this.dom.window = html_template.cloneNode(true);
-        
-        // store window elements in dom object ===============================
-        this.dom.container = this.dom.window.querySelectorAll(".container")[0];
-        this.dom.top_bar = this.dom.window.querySelectorAll(".top_bar")[0];
-        this.dom.title = this.dom.top_bar.querySelectorAll(".title")[0];
-        this.dom.icon = this.dom.top_bar.querySelectorAll(".icon")[0];
-        this.dom.minimize = this.dom.top_bar.querySelectorAll(".minimize")[0];
-        this.dom.maximize = this.dom.top_bar.querySelectorAll(".maximize")[0];
-        this.dom.close = this.dom.top_bar.querySelectorAll(".close")[0];
 
-        this.dom.resize_t = this.dom.window.querySelectorAll(".resize_horizontal")[0];
-        this.dom.resize_b = this.dom.window.querySelectorAll(".resize_horizontal")[1];
+        // clone new window using as html element
+        this.dom.window = html_template.cloneNode(true); // mandatory
         
-        this.dom.resize_l = this.dom.window.querySelectorAll(".resize_vertical")[0];
-        this.dom.resize_r = this.dom.window.querySelectorAll(".resize_vertical")[1];
+        // trying locate all window HTML Elements ===============================
+        this.dom.container = this.dom.window.querySelectorAll(".container")[0]; // mandatory 
+        this.dom.top_bar = this.dom.window.querySelectorAll(".top_bar")[0];  // mandatory 
+        // top_bar elements
+        if( this.dom.top_bar ){
+            this.dom.title = this.dom.top_bar.querySelectorAll(".title")[0];
+            this.dom.icon = this.dom.top_bar.querySelectorAll(".icon")[0];
+            this.dom.minimize = this.dom.top_bar.querySelectorAll(".minimize")[0];
+            this.dom.maximize = this.dom.top_bar.querySelectorAll(".maximize")[0];
+            this.dom.close = this.dom.top_bar.querySelectorAll(".close")[0];
+        }
 
+        // required if resize_h is activated
+        this.dom.resize_t = this.dom.window.querySelectorAll(".resize_vertical")[0];  
+        this.dom.resize_b = this.dom.window.querySelectorAll(".resize_vertical")[1];  
+        
+        // required if resize_w is activated
+        this.dom.resize_l = this.dom.window.querySelectorAll(".resize_horizontal")[0];
+        this.dom.resize_r = this.dom.window.querySelectorAll(".resize_horizontal")[1];
+
+        // required if both resize_w and resize_h is activated
         this.dom.resize_tl = this.dom.window.querySelectorAll(".resize_corner")[0];
         this.dom.resize_tr = this.dom.window.querySelectorAll(".resize_corner")[1];
         this.dom.resize_dl = this.dom.window.querySelectorAll(".resize_corner")[2];
         this.dom.resize_dr = this.dom.window.querySelectorAll(".resize_corner")[3];
-        // ====================================================================
+        // =========================================================================
 
-        // set window attributes and properties 
+        // check if some mandatory or required element missing =====================
+        if(!this.dom.container){
+            console.error(`[DESKTOPjs] error in window ${this.#id} , because missing mandatory element "container" .`);
+            console.info(`[DESKTOPjs] in window html template you need to make html element with class "container" .`);
+            
+            return;
+        }
+        if(!this.dom.top_bar){
+            console.error(`[DESKTOPjs] error in window ${this.#id} , because missing mandatory element "top_bar" .`);
+            console.info(`[DESKTOPjs] in window html template you need to make html element with class "top_bar" .`);
+            
+            return;
+        }
+        if( this.#resize_h  && !this.dom.resize_t || !this.dom.resize_b ){
+            console.error(`[DESKTOPjs] error in window ${this.#id} , because "resize_h" option is activated , but there's no html element for it .`);
+            console.info(`[DESKTOPjs] modifiy your window html template and put two html element with class "resize_vertical" .`)
+            
+            return;
+        }
+        if( this.#resize_w  && !this.dom.resize_l || !this.dom.resize_r ){
+            console.error(`[DESKTOPjs] error in window ${this.#id} , because "resize_w" option is activated , but there's no html element for it `);
+            console.info(`[DESKTOPjs] modifiy your window html template and put two html element with class "resize_horizontal" .`)
+            
+            return;
+        }
+        // =========================================================================
+
+                
+        // filter no needed elements ===============================================
+        
+        // if no needed to minimize button
+        if(!(this.#minimize)){
+            this.dom.minimize.parentNode.removeChild(this.dom.minimize);
+            this.dom.minimize = null;
+        }
+        // if no needed to maximize button
+        if(!(this.#maximize)){
+            this.dom.maximize.parentNode.removeChild(this.dom.maximize);
+            this.dom.maximize = null;
+        }
+        // if no needed to resize in corners
+        if( !this.#resize_h || !this.#resize_w ){
+            this.dom.resize_tl.parentNode.removeChild(this.dom.resize_tl);
+            this.dom.resize_tr.parentNode.removeChild(this.dom.resize_tr);
+            this.dom.resize_dl.parentNode.removeChild(this.dom.resize_dl);
+            this.dom.resize_dr.parentNode.removeChild(this.dom.resize_dr);
+
+            this.dom.resize_tl = null;
+            this.dom.resize_tr = null;
+            this.dom.resize_dl = null;
+            this.dom.resize_dr = null;
+        }
+        // =========================================================================
+        
+
+        // setup window elements ===================================================
+        
+        // setup window attributes and properties 
         this.dom.window.setAttribute("id" , this.#id);
         this.dom.window.style.cssText +=  `left : ${this.#x}px`;
         this.dom.window.style.cssText +=  `top  : ${this.#y}px`;
@@ -62,17 +126,8 @@ export class window{
         
         // set window title
         this.dom.title.textContent = this.#title;
-        
-        // filter no needed elements 
-        if(!(this.#minimize)){
-            this.dom.minimize.parentNode.removeChild(this.dom.minimize);
-        }
-        if(!(this.#maximize)){
-            this.dom.maximize.parentNode.removeChild(this.dom.maximize);
-        }
 
-
-        // setup drag functionallity 
+        // setup drag functionallity for window
         this.dom.top_bar.addEventListener("mousedown" , (e) => {
             this.#env.drag.is_window_in_drag = true;
             e.preventDefault();
@@ -249,14 +304,6 @@ export class window{
                 return this.#title;
             },
 
-            resize_h : () => {
-                return this.#resize_h;
-            },
-
-            resize_w : () => {
-                return this.#resize_w;
-            },
-            
             // function return object contain few values not everything 
             values : () => {
                 return {
@@ -271,7 +318,15 @@ export class window{
                     title : this.#title,
                     focus : this.#focus,
                 }
-            }
+            },
+            
+            resize_h : () => {
+                return this.#resize_h;
+            },
+
+            resize_w : () => {
+                return this.#resize_w;
+            },
         }
 
 
