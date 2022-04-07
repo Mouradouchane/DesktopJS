@@ -12,7 +12,7 @@ export class window{
     #title;
     #focus;
     #resize_h;
-    #resize_w;
+    #resize_v;
 
     // env object private in window
     #env = {
@@ -48,16 +48,17 @@ export class window{
         this.dom.resize_t = this.dom.window.querySelectorAll(".resize_vertical")[0];  
         this.dom.resize_b = this.dom.window.querySelectorAll(".resize_vertical")[1];  
         
-        // required if resize_w is activated
+        // required if resize_h is activated
         this.dom.resize_l = this.dom.window.querySelectorAll(".resize_horizontal")[0];
         this.dom.resize_r = this.dom.window.querySelectorAll(".resize_horizontal")[1];
 
-        // required if both resize_w and resize_h is activated
+        // required if both resize_h and resize_h is activated
         this.dom.resize_tl = this.dom.window.querySelectorAll(".resize_corner")[0];
         this.dom.resize_tr = this.dom.window.querySelectorAll(".resize_corner")[1];
         this.dom.resize_dl = this.dom.window.querySelectorAll(".resize_corner")[2];
         this.dom.resize_dr = this.dom.window.querySelectorAll(".resize_corner")[3];
-        // =========================================================================
+        // end of "locate" =========================================================
+        
 
         // check if some mandatory or required element missing =====================
         if(!this.dom.container){
@@ -72,23 +73,23 @@ export class window{
             
             return;
         }
-        if( this.#resize_h  && !this.dom.resize_t || !this.dom.resize_b ){
-            console.error(`[DESKTOPjs] error in window ${this.#id} , because "resize_h" option is activated , but there's no html element for it .`);
+        if( this.#resize_v  && !this.dom.resize_t || !this.dom.resize_b ){
+            console.error(`[DESKTOPjs] error in window ${this.#id} , because "resize_v" option is activated , but there's no html elements for it .`);
             console.info(`[DESKTOPjs] modifiy your window html template and put two html element with class "resize_vertical" .`)
             
             return;
         }
-        if( this.#resize_w  && !this.dom.resize_l || !this.dom.resize_r ){
-            console.error(`[DESKTOPjs] error in window ${this.#id} , because "resize_w" option is activated , but there's no html element for it `);
+        if( this.#resize_h  && !this.dom.resize_l || !this.dom.resize_r ){
+            console.error(`[DESKTOPjs] error in window ${this.#id} , because "resize_h" option is activated , but there's no html elements for it `);
             console.info(`[DESKTOPjs] modifiy your window html template and put two html element with class "resize_horizontal" .`)
             
             return;
         }
-        // =========================================================================
+        // end of "checks" =========================================================
 
                 
         // filter no needed elements ===============================================
-        
+
         // if no needed to minimize button
         if(!(this.#minimize)){
             this.dom.minimize.parentNode.removeChild(this.dom.minimize);
@@ -99,8 +100,24 @@ export class window{
             this.dom.maximize.parentNode.removeChild(this.dom.maximize);
             this.dom.maximize = null;
         }
+        // if no needed to resize_h
+        if( !this.#resize_h ){
+            this.dom.resize_l.parentNode.removeChild(this.dom.resize_l);
+            this.dom.resize_r.parentNode.removeChild(this.dom.resize_r);
+
+            this.dom.resize_l = null;
+            this.dom.resize_r = null;
+        }
+        // if no needed to resize_v
+        if( !this.#resize_v ){
+            this.dom.resize_t.parentNode.removeChild(this.dom.resize_t);
+            this.dom.resize_b.parentNode.removeChild(this.dom.resize_b);
+            
+            this.dom.resize_t = null;
+            this.dom.resize_b = null;
+        }
         // if no needed to resize in corners
-        if( !this.#resize_h || !this.#resize_w ){
+        if( !this.#resize_h || !this.#resize_v ){
             this.dom.resize_tl.parentNode.removeChild(this.dom.resize_tl);
             this.dom.resize_tr.parentNode.removeChild(this.dom.resize_tr);
             this.dom.resize_dl.parentNode.removeChild(this.dom.resize_dl);
@@ -111,7 +128,7 @@ export class window{
             this.dom.resize_dl = null;
             this.dom.resize_dr = null;
         }
-        // =========================================================================
+        // end of "filter elements "================================================
         
 
         // setup window elements ===================================================
@@ -127,43 +144,57 @@ export class window{
         // set window title
         this.dom.title.textContent = this.#title;
 
-        // setup drag functionallity for window
-        this.dom.top_bar.addEventListener("mousedown" , (e) => {
-            this.#env.drag.is_window_in_drag = true;
+        // setup Drag functionalities for window =====================================
+        this.dom.top_bar.addEventListener("mousedown" , (e) => { // when "drag start"
             e.preventDefault();
-
+            
+            // activate drag boolean
+            this.#env.drag.is_window_in_drag = true;
+            
+            // get mouse x & y
             let mouse_x = e.clientX;
             let mouse_y = e.clientY;
 
-            document.onmousemove = ( e ) => {
+            // set mousemove event to the document for keep tracking dragged window
+            // if drag boolean is activated
+            document.onmousemove =  ( e ) => { // in middle of "drag" 
                 e.preventDefault();
-                if( this.#env.drag.is_window_in_drag ){
-                  
-                    // calculate the new cursor position
+
+                if( this.#env.drag.is_window_in_drag ){ // if window in is really in drag
+                
+                    // calculate the new mouse position
                     let new_mouse_x = mouse_x - e.clientX;
                     let new_mouse_y = mouse_y - e.clientY;
+                    // save current mouse x y 
                     mouse_x = e.clientX;
                     mouse_y = e.clientY;
                     
-                    // set the element's new position
+                    // set new x and y to the window using setter function x and y in window.set
                     this.set.x(this.dom.window.offsetLeft - new_mouse_x);
                     this.set.y(this.dom.window.offsetTop  - new_mouse_y);
 
+                    // if there's call_back_function for this event then run
                     if(this.#env.drag.call_back_function){
+                        // run call_back_function and pass window , event , and some optional args
                         this.#env.drag.call_back_function(this , e , ...(this.#env.drag.call_back_args) )
                     } 
                 }
-            };
+        };
+     
         });
         
-
+        // when "drag end"
         this.dom.top_bar.addEventListener("mouseup", () => {
+            // desactive drag boolean
             this.#env.drag.is_window_in_drag  = false;
+            // drop window
             document.onmousemove = null;
         });
 
+        // end of "setup Drag functionalities" ========================================
 
-        // append this new window to the desktop
+
+        // append this new window to the current desktop
         where_to_append.append(this.dom.window);
     }
 
@@ -186,7 +217,7 @@ export class window{
         this.#maximize  = (typeof(maximize_button) == "boolean") ? maximize_button : true;
         this.#minimize  = (typeof(minimize_button) == "boolean") ? minimize_button : true;
         this.#resize_h  = (typeof(resize_in_horizontal) == "boolean") ? resize_in_horizontal : true;
-        this.#resize_w  = (typeof(resize_in_vertical) == "boolean") ? resize_in_vertical : true;
+        this.#resize_v  = (typeof(resize_in_vertical) == "boolean") ? resize_in_vertical : true;
         
 
         // provide html elements of that element
@@ -222,7 +253,6 @@ export class window{
 
         }
 
-        this.#build(where_to_append , html_template);
 
         // object contain all abilities for modify existing values
         this.set = {
@@ -262,7 +292,7 @@ export class window{
                 else {
                     this.#title = new_title;
                     this.dom.title.textContent = this.#title;
-    
+
                     return true;
                 }
 
@@ -324,12 +354,16 @@ export class window{
                 return this.#resize_h;
             },
 
-            resize_w : () => {
-                return this.#resize_w;
+            resize_v : () => {
+                return this.#resize_v;
             },
         }
 
 
+        // *** important process before the end ***
+        
+        // call build function for building this window
+        this.#build(where_to_append , html_template);
     }
 
 
