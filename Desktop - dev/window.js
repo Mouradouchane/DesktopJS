@@ -17,11 +17,29 @@ export class window{
     // env object private in window
     #env = {
         
-        // drag event : DATA
+        // drag events : call_back's and arg's and ...
         drag : {
+
             is_window_in_drag : false,
-            call_back_function : null,
-            call_back_args : [],
+
+            // for drag start
+            start : {
+                call_back_function : null,
+                call_back_args : [],
+            },
+            
+            // for drag in 
+            in : {
+                call_back_function : null,
+                call_back_args : [],
+            },
+            
+            // for drag end 
+            end : {
+                call_back_function : null,
+                call_back_args : [],
+            },
+
         },
     }
 
@@ -173,22 +191,35 @@ export class window{
                     this.set.x(this.dom.window.offsetLeft - new_mouse_x);
                     this.set.y(this.dom.window.offsetTop  - new_mouse_y);
 
-                    // if there's call_back_function for this event then run
-                    if(this.#env.drag.call_back_function){
-                        // run call_back_function and pass window , event , and some optional args
-                        this.#env.drag.call_back_function(this , e , ...(this.#env.drag.call_back_args) )
+                    // if there's call_back_function for "drag" 
+                    if(this.#env.drag.in.call_back_function){
+                        // run it and pass (window , event , and some optional args)
+                        this.#env.drag.in.call_back_function(this , e , ...(this.#env.drag.in.call_back_args) )
                     } 
                 }
         };
      
+        // if there's call_back_function for "drag_start" 
+        if(this.#env.drag.start.call_back_function){
+            // run it and pass (window , event , and some optional args , if available)
+            this.#env.drag.start.call_back_function(this , e , ...(this.#env.drag.start.call_back_args) )
+        } 
+
         });
         
         // when "drag end"
-        this.dom.top_bar.addEventListener("mouseup", () => {
+        this.dom.top_bar.addEventListener("mouseup", (e) => {
             // desactive drag boolean
             this.#env.drag.is_window_in_drag  = false;
             // drop window
             document.onmousemove = null;
+
+            // if there's call_back_function for "drag_end" 
+            if(this.#env.drag.end.call_back_function){
+                // run it and pass (window , event , and some optional args , if available)
+                this.#env.drag.end.call_back_function(this , e , ...(this.#env.drag.end.call_back_args) )
+            } 
+
         });
 
         // end of "setup Drag functionalities" ========================================
@@ -235,21 +266,54 @@ export class window{
         // object provide events 
         this.on  = {
 
-            // when window dragged
-            drag : (call_back_function = null , ...args ) => {
-
-                // call_back_function must be function
+            // when drag start
+            drag_start : ( call_back_function = null , ...args ) => {
+                
+                // check if call_back_function parameter is function
                 if(typeof(call_back_function) == "function"){
-                    
-                    // save call back function and it's arguments
-                    this.#env.drag.call_back_function = call_back_function;
-                    this.#env.drag.call_back_args = args;
+                                    
+                    // save call_back_function and it's arguments
+                    this.#env.drag.start.call_back_function = call_back_function;
+                    this.#env.drag.start.call_back_args = args;
 
                 }
                 else{ // mean call_back_function is not function 
                     console.error("[DESKTOPjs] parameter 'call_back_function' must be function");
                 }
-            }
+
+            },
+
+            // when drag in "active"
+            drag : ( call_back_function = null , ...args ) => {
+
+                // call_back_function must be function
+                if(typeof(call_back_function) == "function"){
+                    
+                    // save call_back_function and it's arguments
+                    this.#env.drag.in.call_back_function = call_back_function;
+                    this.#env.drag.in.call_back_args = args;
+
+                }
+                else{ // mean call_back_function is not function 
+                    console.error("[DESKTOPjs] parameter 'call_back_function' must be function");
+                }
+            },
+
+            // when drag end
+            drag_end : ( call_back_function = null , ...args ) => {
+
+                // call_back_function must be function
+                if(typeof(call_back_function) == "function"){
+                    
+                    // save call_back_function and it's arguments
+                    this.#env.drag.end.call_back_function = call_back_function;
+                    this.#env.drag.end.call_back_args = args;
+
+                }
+                else{ // mean call_back_function is not function 
+                    console.error("[DESKTOPjs] parameter 'call_back_function' must be function");
+                }
+            },
 
         }
 
@@ -261,12 +325,12 @@ export class window{
             x : ( new_x = 0) => {
                 // check
                 if( typeof(new_x) == "number"){
-                    this.#x =  new_x; // set new value if it valid
+                    this.#x = new_x; // set new value if it valid
                     this.dom.window.style.left = this.#x + "px";
                     return true; // return confirmation :)
                 }
                 else { // mean invalid value
-                    console.warn("[DESKTOPjs] new_x parameter must be number")
+                    console.warn("[DESKTOPjs] new_x parameter must be number ")
                     return false; // return confirmation :(
                 }
             },
@@ -278,7 +342,7 @@ export class window{
                     return true;
                 }
                 else {
-                    console.warn("[DESKTOPjs] new_y parameter must be number");
+                    console.warn("[DESKTOPjs] new_y parameter must be number ");
                     return false;
                 }
             },
