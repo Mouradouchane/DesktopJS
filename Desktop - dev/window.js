@@ -249,6 +249,14 @@ export class window{
                 return this.#title;
             },
 
+            resize_h : () => {
+                return this.#resize_h;
+            },
+
+            resize_w : () => {
+                return this.#resize_w;
+            },
+            
             // function return object contain few values not everything 
             values : () => {
                 return {
