@@ -20,34 +20,19 @@ export class desktop{
             this.#desktop_html = document.body;
 
             // log warn and help
-            console.warn("[DESKTOPjs] ",`'desktop html element id' you pass in not found or invalid , because parameter desktop_html_id is ${desktop_html_id}`);
-            console.info("[DESKTOPjs] ",`default selection will be the "html body"`);
+            console.warn(`[DESKTOPjs] 'desktop html element id' you pass in not found or invalid , because parameter desktop_html_id is ${desktop_html_id}`);
+            console.info(`[DESKTOPjs] default selection will be the "html body"`);
            
         }
 
 
-        // ENV object like sitting
-        // ENV where we controll variables like icons size & ...
+        // ENV object like sitting , where variables like "icons size" and more ...
         this.env = {
 
-            // object for library log messagaes errors ...
-            lib : {
-                // title should be in any log comming from library
-                title  : "[DESKTOPjs] ",
-
-                // all messages about errors
-                errors : {
-
-                },
-
-                // all messages about helps
-                helps : {
-
-                }
-            },
-
             // where all desktop variables get stored for usage
-            desktop : { },
+            desktop : { 
+
+            },
 
             // where all templates get stored for usage
             templates : {
@@ -70,18 +55,18 @@ export class desktop{
         // object responsible for adding new object the OS stuff like => window,notification,files,...
         this.new = {
 
-            // add new window
+            // make new window
             window : (
                 id = "def" , title = "window" , x = 10, y = 10 , height = 512, width = 512 , 
                 focus = true , maximise_button = true , minimise_button = true , visible = true , 
-                where_to_append = null
+                resize_in_horizontal = true , resize_in_vertical = true , where_to_append = null
             ) => {
 
                 // if window html template not defined yet
                 if(!this.env.templates.window.html){
                     
-                    console.error(this.env.lib.title + `error while constructing window , because there's no html template for windows .`);
-                    console.hint(this.env.lib.title + `use '.set.window.html' function in desktop object to solve this problem .`);
+                    console.error(`[DESKTOPjs] error while constructing window , because there's no html template for windows .`);
+                    console.hint(`[DESKTOPjs] use '.set.window.html' function in desktop object to solve this problem .`);
                    
                     return null;
                 }
@@ -92,9 +77,11 @@ export class desktop{
 
                     // define new window 
                     this.running[id] = new window(
-                        id,title,x,y,height,width,focus,
-                        maximise_button,
+                        id , title , x , y , height , width , focus ,
+                        maximise_button ,
                         minimise_button,visible , 
+                        resize_in_horizontal ,
+                        resize_in_vertical ,
                         this.#desktop_html ,
                         this.env.templates.window.html
                     );
@@ -106,10 +93,10 @@ export class desktop{
                 else{ 
                     // else mean id is already reserved or invalid , soo no duplicate of id's
                     if(typeof(id) != "string"){
-                        console.error(this.env.lib.title + `window "id" must be string`);
+                        console.error(`[DESKTOPjs] window "id" must be string .`);
                     }
                     else {
-                        console.error(this.env.lib.title + `this ${id} is already reserved by another window`);
+                        console.error(`[DESKTOPjs] this ${id} is already reserved by another window .`);
                     }
 
                     return null;
@@ -131,7 +118,7 @@ export class desktop{
                     return html.body.firstElementChild;
                 }
                 catch(err) { // in case any error happen 
-                    console.error(this.env.lib.title + "parsing html error : " , err);
+                    console.error(`[DESKTOPjs] parsing html error : ${err} .`);
                     throw null;
                 }
 
@@ -150,7 +137,7 @@ export class desktop{
                         // set id if there's no id
                         if(styleElement.id != "window_style") {
                             styleElement.id = "window_style";
-                            console.warn(this.env.lib.title + "generating new style for window ...");
+                            console.warn("[DESKTOPjs] generating new style for window ...");
                         }
 
                         // set new style to the DOM & ENV
@@ -161,7 +148,7 @@ export class desktop{
                         return true;
                     }
                     catch(err){
-                        console.error(this.env.lib.title + "set style for window tempaltes error : " , err);
+                        console.error(`[DESKTOPjs] set style for window tempaltes error : ${err} .`);
                         return false;
                     }
 
@@ -176,7 +163,7 @@ export class desktop{
 
                     // if template_to_HTML function throw null that mean error happend in parsing
                     if(parsed_html == null){
-                        console.warn,(this.env.lib.title + "possible something went wrong while parsing")
+                        console.warn,(`[DESKTOPjs] possible something went wrong while parsing .`)
                         return false;
                     }
                     // set new template to ENV
