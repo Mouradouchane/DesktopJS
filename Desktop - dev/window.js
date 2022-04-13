@@ -40,6 +40,7 @@ export class window{
                 call_back_args : [],
             },
 
+<<<<<<< HEAD
             //for window open
             open : {
                 call_back_function : null,
@@ -51,6 +52,8 @@ export class window{
                 call_back_function : null,
                 call_back_args : [],
             },
+=======
+>>>>>>> 2e20fdf3dbaa9a4739ca6b82a2009eea0a657c61
         },
     }
 
@@ -88,6 +91,7 @@ export class window{
         this.dom.resize_dr = this.dom.window.querySelectorAll(".resize_corner")[3];
         // end of "locate" =========================================================
         
+<<<<<<< HEAD
 
         // check if some mandatory or required element missing =====================
         if(!this.dom.container){
@@ -134,6 +138,54 @@ export class window{
             this.dom.resize_l.parentNode.removeChild(this.dom.resize_l);
             this.dom.resize_r.parentNode.removeChild(this.dom.resize_r);
 
+=======
+
+        // check if some mandatory or required element missing =====================
+        if(!this.dom.container){
+            console.error(`[DESKTOPjs] error in window ${this.#id} , because missing mandatory element "container" .`);
+            console.info(`[DESKTOPjs] in window html template you need to make html element with class "container" .`);
+            
+            return;
+        }
+        if(!this.dom.top_bar){
+            console.error(`[DESKTOPjs] error in window ${this.#id} , because missing mandatory element "top_bar" .`);
+            console.info(`[DESKTOPjs] in window html template you need to make html element with class "top_bar" .`);
+            
+            return;
+        }
+        if( this.#resize_v  && !this.dom.resize_t || !this.dom.resize_b ){
+            console.error(`[DESKTOPjs] error in window ${this.#id} , because "resize_v" option is activated , but there's no html elements for it .`);
+            console.info(`[DESKTOPjs] modifiy your window html template and put two html element with class "resize_vertical" .`)
+            
+            return;
+        }
+        if( this.#resize_h  && !this.dom.resize_l || !this.dom.resize_r ){
+            console.error(`[DESKTOPjs] error in window ${this.#id} , because "resize_h" option is activated , but there's no html elements for it `);
+            console.info(`[DESKTOPjs] modifiy your window html template and put two html element with class "resize_horizontal" .`)
+            
+            return;
+        }
+        // end of "checks" =========================================================
+
+                
+        // filter no needed elements ===============================================
+
+        // if no needed to minimize button
+        if(!(this.#minimize)){
+            this.dom.minimize.parentNode.removeChild(this.dom.minimize);
+            this.dom.minimize = null;
+        }
+        // if no needed to maximize button
+        if(!(this.#maximize)){
+            this.dom.maximize.parentNode.removeChild(this.dom.maximize);
+            this.dom.maximize = null;
+        }
+        // if no needed to resize_h
+        if( !this.#resize_h ){
+            this.dom.resize_l.parentNode.removeChild(this.dom.resize_l);
+            this.dom.resize_r.parentNode.removeChild(this.dom.resize_r);
+
+>>>>>>> 2e20fdf3dbaa9a4739ca6b82a2009eea0a657c61
             this.dom.resize_l = null;
             this.dom.resize_r = null;
         }
@@ -224,6 +276,7 @@ export class window{
             this.#env.drag.is_window_in_drag  = false;
             // drop window
             document.onmousemove = null;
+<<<<<<< HEAD
 
             // if there's call_back_function for "drag_end" 
             if(this.#env.drag.end.call_back_function){
@@ -233,6 +286,17 @@ export class window{
 
         });
 
+=======
+
+            // if there's call_back_function for "drag_end" 
+            if(this.#env.drag.end.call_back_function){
+                // run it and pass (window , event , and some optional args , if available)
+                this.#env.drag.end.call_back_function(this , e , ...(this.#env.drag.end.call_back_args) )
+            } 
+
+        });
+
+>>>>>>> 2e20fdf3dbaa9a4739ca6b82a2009eea0a657c61
         // end of "setup Drag functionalities" ========================================
 
 
@@ -326,6 +390,7 @@ export class window{
                 }
             },
 
+<<<<<<< HEAD
             //wehn window open 
             open : ( call_back_function = null , ...args ) => {
 
@@ -357,6 +422,8 @@ export class window{
                     console.error("[DESKTOPjs] parameter 'call_back_function' must be function");
                 }
             },
+=======
+>>>>>>> 2e20fdf3dbaa9a4739ca6b82a2009eea0a657c61
         }
 
 
