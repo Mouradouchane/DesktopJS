@@ -428,6 +428,17 @@ export class window{
         
         // call build function for building this window
         this.#build(where_to_append , html_template);
+
+
+        // some important and direct functions
+
+        this.open = () =>{ // if you want to op
+
+        }
+
+        this.close = () =>{
+
+        }
     }
 
 
