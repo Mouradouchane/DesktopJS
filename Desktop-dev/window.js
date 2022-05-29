@@ -159,7 +159,7 @@ export class window{
         this.dom.window.style.cssText +=  `height  : ${this.#height}px`;
         this.dom.window.style.cssText +=  `visibility  : ${ (this.#visible) ? "visible" : "hidden"}`;
         
-        // set window title
+        // setup window title
         this.dom.title.textContent = this.#title;
 
         // setup Drag functionalities for window =====================================
@@ -260,6 +260,14 @@ export class window{
             // for check if this window in drag right now or not  
             in_drag : () => {
                 return this.#env.drag.is_window_in_drag;
+            },
+
+            open : () => {
+                return this.#visible ;
+            },
+
+            close : () => {
+                return this.#visible ? false : true;
             }
         }
 
@@ -362,6 +370,14 @@ export class window{
 
             },
 
+            visibility : ( is_visible = true ) => {
+                
+                this.#visible = ( is_visible ? true : false );
+                this.dom.window.style.cssText +=  `visibility  : ${ (this.#visible) ? "visible" : "hidden"}`;
+
+            },
+
+
             values : ( new_values = {} ) => {
                 /* function need work :) */
             },
@@ -390,7 +406,7 @@ export class window{
                 return this.#height;
             },
 
-            visible : () => {
+            visibility : () => {
                 return this.#visible;
             },
         
@@ -399,7 +415,7 @@ export class window{
             },
 
             // function return object contain few values not everything 
-            values : () => {
+            all : () => {
                 return {
                     id : this.#id,
                     x : this.#x,
@@ -423,22 +439,49 @@ export class window{
             },
         }
 
+        
+        // some important and direct functions
+
+        // when user want to open window
+        this.open  = ( call_back_function , ...call_back_args ) =>{ 
+
+            // make window visible 'open'
+            if(!this.#visible) this.set.visibility(true);
+
+            // call_back_function must be function
+            if( typeof(call_back_function) === "function" ) {
+
+                call_back_function(this , ...call_back_args);
+            }
+            else {
+                console.warn("parameter call_back_function must be 'function'");
+            }
+            
+            return this;
+        }
+
+        // when user want to close window
+        this.close = ( call_back_function, ...call_back_args ) =>{
+
+            // make window visible 'open'
+            if(this.#visible) this.set.visibility(false);
+
+            if( typeof(call_back_function) === "function" ) {
+                call_back_function(this , ...call_back_args);
+            }  
+            else {
+                console.warn("parameter call_back_function must be 'function'");
+            }
+            
+        }
+
+
 
         // *** important process before the end ***
         
         // call build function for building this window
         this.#build(where_to_append , html_template);
 
-
-        // some important and direct functions
-
-        this.open = () =>{ // if you want to op
-
-        }
-
-        this.close = () =>{
-
-        }
     }
 
 
