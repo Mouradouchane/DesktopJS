@@ -41,6 +41,31 @@ export class window{
             },
 
         },
+
+        // maximize event callback & args
+        maximize : {
+            call_back_function : null,
+            call_back_args : [],
+        },
+
+        // minimize event callback & args
+        minimize : {
+            call_back_function : null,
+            call_back_args : [],
+        },
+
+        // foucs event callback & args
+        foucs : {
+            call_back_function : null,
+            call_back_args : [],
+        },
+
+        // blur event callback & args
+        blur : {
+            call_back_function : null,
+            call_back_args : [],
+        },
+        
     }
 
 
@@ -268,7 +293,28 @@ export class window{
 
             close : () => {
                 return this.#visible ? false : true;
+            },
+
+            // ============ need work ============
+            foucs : () => {
+
+            },
+
+            // ============ need work ============
+            blur : () => {
+
+            },
+
+            // ============ need work ============
+            maximize : () => {
+
+            },
+
+            // ============ need work ============
+            minimize : () => {
+
             }
+
         }
 
         // object provide events 
@@ -323,6 +369,26 @@ export class window{
                 }
             },
 
+
+            // ============ need work ============
+            foucs : () => {
+
+            },
+
+            // ============ need work ============
+            blur : () => {
+
+            },
+
+            // ============ need work ============
+            maximize : () => {
+
+            },
+
+            // ============ need work ============
+            minimize : () => {
+
+            }
         }
 
 
@@ -342,6 +408,7 @@ export class window{
                     return false; // return confirmation :(
                 }
             },
+
             // like x() function
             y : ( new_y = 0 ) => {
                 if( typeof(new_y) == "number"){
@@ -355,6 +422,7 @@ export class window{
                 }
             },
 
+            // set new window title 
             title : ( new_title = "" ) => {
 
                 if(typeof(new_title) != "string"){
@@ -370,6 +438,7 @@ export class window{
 
             },
 
+            // set visiblity function used with open & close functions
             visibility : ( is_visible = true ) => {
                 
                 this.#visible = ( is_visible ? true : false );
@@ -377,11 +446,15 @@ export class window{
 
             },
 
+            // set public properties at once  
+            properties : ( new_public_values = {} ) => {
+                
+                // loop over all and set as public properties
+                for(let name in new_public_values){
+                    this[name] = new_public_values[name];
+                }
 
-            values : ( new_values = {} ) => {
-                /* function need work :) */
             },
-
         }
 
         // object provides all possible needed values public or private 
@@ -414,20 +487,21 @@ export class window{
                 return this.#title;
             },
 
-            // function return object contain few values not everything 
-            all : () => {
-                return {
-                    id : this.#id,
-                    x : this.#x,
-                    y : this.#y,
-                    height : this.#height,
-                    width : this.#width,
-                    visible : this.#visible,
-                    minimize : this.#minimize,
-                    maximize : this.#maximize,
-                    title : this.#title,
-                    focus : this.#focus,
+            // function return object contain a few available "values" 
+            values : () => {
+                
+                // object who gonna take all possible properties  
+                let values = {};
+
+                // get all possible properties using all functions in get object
+                for( let property in this.get){
+
+                    // if property name is 'all' then "skip it avoiding recursive call"
+                    if(property != "all") values[property] = this.get[property]();
+
                 }
+
+                return values;
             },
             
             resize_h : () => {
@@ -443,7 +517,7 @@ export class window{
         // some important and direct functions
 
         // when user want to open window
-        this.open  = ( call_back_function , ...call_back_args ) =>{ 
+        this.open  = ( call_back_function = null , ...call_back_args ) =>{ 
 
             // make window visible 'open'
             if(!this.#visible) this.set.visibility(true);
@@ -454,14 +528,16 @@ export class window{
                 call_back_function(this , ...call_back_args);
             }
             else {
-                console.warn("parameter call_back_function must be 'function'");
+                if( call_back_function != null ) {
+                    console.warn("parameter call_back_function must be 'function'");
+                }
             }
             
             return this;
         }
 
         // when user want to close window
-        this.close = ( call_back_function, ...call_back_args ) =>{
+        this.close = ( call_back_function = null , ...call_back_args ) =>{
 
             // make window visible 'open'
             if(this.#visible) this.set.visibility(false);
@@ -470,7 +546,9 @@ export class window{
                 call_back_function(this , ...call_back_args);
             }  
             else {
-                console.warn("parameter call_back_function must be 'function'");
+                if( call_back_function != null ) {
+                    console.warn("parameter call_back_function must be 'function'");
+                }
             }
             
         }
