@@ -67,7 +67,9 @@ let window = desktop.new.window( ...new_window_args );
 window.open();
 
 // setup drag start event with call_back_function 
-window.on.drag_start( function( window , e ) { ... } );
+window.on.drag_start( function( window , e ) {
+    // some code here ... 
+});
 
 // check if this window is resizable or not :)
 window.is.resizable();
