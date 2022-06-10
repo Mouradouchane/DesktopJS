@@ -54,20 +54,20 @@ let win_html_str = "...";
 let win_css_str  = "...";
 
 // main object
-const desktop = new desktop();
+const desktop = new desktop( document.body );
 
 // set tempaltes to the desktop object
 desktop.set.window.html( win_html_str );
 desktop.set.window.css( win_css_str  );
 
 // make new window
-let window = desktop.new.window(...new_window_args);
+let window = desktop.new.window( ...new_window_args );
 
 // open and make window visible
 window.open();
 
-// set new title to this window
-window.set.title( "new title" );
+// setup drag start event with call_back_function 
+window.on.drag_start( function( window , e ) { ... } );
 
 // check if this window is resizable or not :)
 window.is.resizable();
@@ -75,7 +75,7 @@ window.is.resizable();
 ``` 
 
 ### Documentation :
-if you want to learn more and understand more about this library you can start from here at [docs](../../wiki)
+if you want to learn more about this library you can start from here at [docs](../../wiki)
 
 ### Contributions :
 your welcome this repo is open for everyone , just before you start working in anything just text me first in [discussions](../../discussions) or open [issues](../../issues) 😃
