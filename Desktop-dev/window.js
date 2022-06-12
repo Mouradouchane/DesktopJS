@@ -618,8 +618,7 @@ export class window{
             
         }
 
-
-
+        
         // *** important process before the end ***
         
         // call build function for building this window
