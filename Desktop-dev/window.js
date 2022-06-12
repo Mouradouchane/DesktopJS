@@ -16,11 +16,12 @@ export class window{
     #minimize;
     #maximize;
     #title;
-    #focus;
     #resize_h;
     #resize_v;
     #index = window.index += 1;
-    
+    #focus;
+    #current_style = "default";
+
     // env object for window sitting's "private"
     #env = {
         
@@ -40,13 +41,12 @@ export class window{
                 call_back_function : null,
                 call_back_args : [],
             },
-            
+
             // for drag end 
             end : {
                 call_back_function : null,
                 call_back_args : [],
             },
-
         },
 
         // maximize event callback & args
@@ -185,6 +185,7 @@ export class window{
         
         // window attributes and properties 
         this.dom.window.setAttribute("id" , this.#id);
+        this.dom.window.classList.add(this.#current_style);
         this.dom.window.style.cssText +=  `left : ${this.#x}px`;
         this.dom.window.style.cssText +=  `top  : ${this.#y}px`;
         this.dom.window.style.cssText +=  `width  : ${this.#width}px`;
@@ -199,16 +200,18 @@ export class window{
         // setup drag functionalities for window =====================================
         this.dom.top_bar.addEventListener("mousedown" , (e) => { // when "drag start"
             e.preventDefault();
-            debugger
+            //debugger
             
             // activate drag boolean
             this.#env.drag.is_window_in_drag = true;
 
-            // set darg index
+            // this window in drag event need to be in the top of all other windows 
+            // set index to the max_index + 1 
             if(this.#index < window.max_index){
                 window.max_index += 1;
                 this.dom.window.style.zIndex = window.max_index;
             } 
+            this.#focus = true;
 
             
             // get mouse x & y
@@ -255,12 +258,13 @@ export class window{
             
             // switch to drag off
             this.#env.drag.is_window_in_drag  = false;
+            this.#focus = false;
             
             // drop window
             document.onmousemove = null;
 
             // if there's call_back_function for "drag_end" 
-            if(this.#env.drag.end.call_back_function){
+            if( this.#env.drag.end.call_back_function ){
                 // run it and pass (window , event , and some optional args , if available)
                 this.#env.drag.end.call_back_function(this , e , ...(this.#env.drag.end.call_back_args) )
             } 
@@ -271,12 +275,12 @@ export class window{
 
 
         // append this new window to the current desktop
-        where_to_append.append(this.dom.window);
+        if(where_to_append) where_to_append.append(this.dom.window);
     }
 
     constructor(
         id = null , title = "window" , x = 10, y = 10 , height = 512, width = 512 , 
-        focus = true , maximize_button = true , minimize_button = true , 
+        maximize_button = true , minimize_button = true , 
         visible = true , resize_in_horizontal = true , resize_in_vertical = true , 
         where_to_append = null , html_template = null 
     ){
@@ -315,11 +319,14 @@ export class window{
                 return this.#visible ? false : true;
             },
 
-            // ============ need work ============
             foucs : () => {
+                //debugger;
 
+                this.#focus = (this.get.z_index() >= window.max_index);
+                return this.#focus;
+                
             },
-
+            
             // ============ need work ============
             blur : () => {
 
@@ -458,6 +465,53 @@ export class window{
 
             },
 
+            // function to set css class_name to all window element's 
+            // used for change to foucs style , blur style .... 
+            current_style : ( current_style_class_name = "") => {
+
+                if( typeof(current_style_class_name) !== "string" ){
+                    console.error( "passed parameter to current_style function must be 'string' .");
+                }
+                else {
+
+                    for(let element of this.dom){
+                        // remove old state class
+                        element.classList.remove(this.#current_style);
+                        // add new state class
+                        element.classList.add(current_style_class_name);
+                    }
+                    
+                    this.#current_style = current_style_class_name;
+                }
+
+            },
+
+            // add or replace class_name to all elements in window
+            class  : ( class_name = "" , replace = false) => {
+
+                if( typeof(class_name) !== "string" ){
+                    console.error( "parameter 'class_name' in class function must be 'string' ." );
+                }
+                else {
+
+                    for(let element of this.dom){
+
+                        if(replace){
+                        
+                            // remove old class
+                            element.classList.remove(class_name);
+                            element.classList.add(class_name);
+                            
+                        }
+                        else{
+                            element.classList.add(class_name);
+                        }
+                    }
+
+                }
+
+            },
+
             // set visiblity function used with open & close functions
             visibility : ( is_visible = true ) => {
                 
@@ -510,6 +564,15 @@ export class window{
             index : () => {
                 return this.#index;
             },
+
+            z_index : () => {
+                return this.dom.window.style.zIndex;
+            },
+
+            current_style : () => {
+                return this.#current_style;
+            },
+
 
             // function return object contain a few available "values" 
             values : () => {
