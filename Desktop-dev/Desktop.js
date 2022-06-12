@@ -42,14 +42,16 @@ export class desktop{
                     css  : null ,
                 }   
 
-            }
+            },
 
         }
 
         // object where we store all running desktop elements window,folder,...
         // storing by "element id"
         this.running = {
+            windows : {
 
+            },
         }
         
         // object responsible for adding new object the OS stuff like => window,notification,files,...
@@ -73,10 +75,10 @@ export class desktop{
 
                 // make new window only if id "string" & id is "not reserved"
                 //if(this.running[id] == undefined || this.running[id] == null){
-                if( typeof(id) == "string" && !this.running[id] ){
+                if( typeof(id) == "string" && !this.running.windows[id] ){
 
                     // define new window 
-                    this.running[id] = new window(
+                    this.running.windows[id] = new window(
                         id , title , x , y , height , width , focus ,
                         maximise_button ,
                         minimise_button,visible , 
@@ -87,7 +89,7 @@ export class desktop{
                     );
                     
                     // then return it reference
-                    return this.running[id];
+                    return this.running.windows[id];
 
                 }
                 else{ 

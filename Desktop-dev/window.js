@@ -1,5 +1,11 @@
 
 export class window{
+    
+    // === static properties for class it's self ===
+    // windows index's for dealing with window : drag drop foucs blur ... 
+    static index = 0;
+    static max_index = 0;
+
     // === private properties ===
     #id;
     #x;
@@ -13,8 +19,9 @@ export class window{
     #focus;
     #resize_h;
     #resize_v;
-
-    // env object private in window
+    #index = window.index += 1;
+    
+    // env object for window sitting's "private"
     #env = {
         
         // drag events : call_back's and arg's and ...
@@ -176,27 +183,38 @@ export class window{
 
         // setup window elements ===================================================
         
-        // setup window attributes and properties 
+        // window attributes and properties 
         this.dom.window.setAttribute("id" , this.#id);
         this.dom.window.style.cssText +=  `left : ${this.#x}px`;
         this.dom.window.style.cssText +=  `top  : ${this.#y}px`;
         this.dom.window.style.cssText +=  `width  : ${this.#width}px`;
         this.dom.window.style.cssText +=  `height  : ${this.#height}px`;
         this.dom.window.style.cssText +=  `visibility  : ${ (this.#visible) ? "visible" : "hidden"}`;
+        this.dom.window.style.zIndex = this.#index;
+        window.max_index += 1;
         
-        // setup window title
+        // window title
         this.dom.title.textContent = this.#title;
 
-        // setup Drag functionalities for window =====================================
+        // setup drag functionalities for window =====================================
         this.dom.top_bar.addEventListener("mousedown" , (e) => { // when "drag start"
             e.preventDefault();
+            debugger
             
             // activate drag boolean
             this.#env.drag.is_window_in_drag = true;
+
+            // set darg index
+            if(this.#index < window.max_index){
+                window.max_index += 1;
+                this.dom.window.style.zIndex = window.max_index;
+            } 
+
             
             // get mouse x & y
             let mouse_x = e.clientX;
             let mouse_y = e.clientY;
+
 
             // set mousemove event to the document for keep tracking dragged window
             // if drag boolean is activated
@@ -234,8 +252,10 @@ export class window{
         
         // when "drag end"
         this.dom.top_bar.addEventListener("mouseup", (e) => {
-            // desactive drag boolean
+            
+            // switch to drag off
             this.#env.drag.is_window_in_drag  = false;
+            
             // drop window
             document.onmousemove = null;
 
@@ -485,6 +505,10 @@ export class window{
         
             title : () => {
                 return this.#title;
+            },
+
+            index : () => {
+                return this.#index;
             },
 
             // function return object contain a few available "values" 
