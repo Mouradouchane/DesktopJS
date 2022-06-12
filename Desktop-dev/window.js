@@ -20,7 +20,6 @@ export class window{
     #resize_v;
     #index = window.index += 1;
     #focus;
-    #current_style = "default";
 
     // env object for window sitting's "private"
     #env = {
@@ -185,7 +184,6 @@ export class window{
         
         // window attributes and properties 
         this.dom.window.setAttribute("id" , this.#id);
-        this.dom.window.classList.add(this.#current_style);
         this.dom.window.style.cssText +=  `left : ${this.#x}px`;
         this.dom.window.style.cssText +=  `top  : ${this.#y}px`;
         this.dom.window.style.cssText +=  `width  : ${this.#width}px`;
@@ -329,7 +327,11 @@ export class window{
             
             // ============ need work ============
             blur : () => {
-
+                //debugger;
+    
+                this.#focus = (this.get.z_index() >= window.max_index);
+                return !this.#focus;
+                
             },
 
             // ============ need work ============
@@ -465,47 +467,28 @@ export class window{
 
             },
 
-            // function to set css class_name to all window element's 
-            // used for change to foucs style , blur style .... 
-            current_style : ( current_style_class_name = "") => {
-
-                if( typeof(current_style_class_name) !== "string" ){
-                    console.error( "passed parameter to current_style function must be 'string' .");
-                }
-                else {
-
-                    for(let element of this.dom){
-                        // remove old state class
-                        element.classList.remove(this.#current_style);
-                        // add new state class
-                        element.classList.add(current_style_class_name);
-                    }
-                    
-                    this.#current_style = current_style_class_name;
-                }
-
-            },
-
             // add or replace class_name to all elements in window
-            class  : ( class_name = "" , replace = false) => {
+            class  : ( class_name = "" , old_class_name = "", replace = false) => {
+                debugger
 
                 if( typeof(class_name) !== "string" ){
                     console.error( "parameter 'class_name' in class function must be 'string' ." );
                 }
                 else {
 
-                    for(let element of this.dom){
+                    for(let element in this.dom){
 
                         if(replace){
                         
                             // remove old class
-                            element.classList.remove(class_name);
-                            element.classList.add(class_name);
+                            this.dom[element].classList.remove(old_class_name);
+                            this.dom[element].classList.add(class_name);
                             
                         }
                         else{
-                            element.classList.add(class_name);
+                            this.dom[element].classList.add(class_name);
                         }
+                        
                     }
 
                 }
@@ -568,11 +551,6 @@ export class window{
             z_index : () => {
                 return this.dom.window.style.zIndex;
             },
-
-            current_style : () => {
-                return this.#current_style;
-            },
-
 
             // function return object contain a few available "values" 
             values : () => {
