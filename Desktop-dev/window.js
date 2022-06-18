@@ -195,8 +195,10 @@ export class window{
         // window title
         this.dom.title.textContent = this.#title;
 
-        // setup drag functionalities for window =====================================
-        this.dom.top_bar.addEventListener("mousedown" , (e) => { // when "drag start"
+        // setup window functionalities & events =====================================
+
+        // setup drag/drag_start/drag_end event 
+        this.dom.top_bar.addEventListener("mousedown" , (e) => {
             e.preventDefault();
             //debugger
             
@@ -209,6 +211,15 @@ export class window{
                 window.max_index += 1;
                 this.dom.window.style.zIndex = window.max_index;
             } 
+
+            debugger
+            // run only if call_back_function valid & window not in foucs
+            if( this.#env.foucs.call_back_function && !(this.is.foucs()) ){
+                // call event function
+                this.#env.foucs.call_back_function( this , e , ...(this.#env.foucs.call_back_args) );
+            }
+
+            // switch to foucs on 
             this.#focus = true;
 
             
@@ -238,7 +249,7 @@ export class window{
                     // if there's call_back_function for "drag" 
                     if(this.#env.drag.in.call_back_function){
                         // run it and pass (window , event , and some optional args)
-                        this.#env.drag.in.call_back_function(this , e , ...(this.#env.drag.in.call_back_args) )
+                        this.#env.drag.in.call_back_function( this , e , ...(this.#env.drag.in.call_back_args) )
                     } 
                 }
         };
@@ -250,7 +261,7 @@ export class window{
         } 
 
         });
-        
+
         // when "drag end"
         this.dom.top_bar.addEventListener("mouseup", (e) => {
             
@@ -269,7 +280,30 @@ export class window{
 
         });
 
-        // end of "setup Drag functionalities" ========================================
+        
+        // setup foucs event
+        this.dom.window.addEventListener("click" , (e) => {
+            //debugger
+            
+            // run only if call_back_function valid & window not in foucs
+            if( this.#env.foucs.call_back_function && !this.is.foucs() ){
+                // call event function
+                this.#env.foucs.call_back_function( this , e , ...(this.#env.foucs.call_back_args) );
+            }
+
+            // this window in drag event need to be in the top of all other windows 
+            // set index to the max_index + 1 
+            if(this.#index < window.max_index){
+                window.max_index += 1;
+                this.dom.window.style.zIndex = window.max_index;
+            } 
+ 
+            // switch to foucs on 
+            this.#focus = true;
+        })
+
+
+        // end of "setup functionalities & events" ========================================
 
 
         // append this new window to the current desktop
@@ -399,13 +433,35 @@ export class window{
             },
 
 
-            // ============ need work ============
-            foucs : () => {
+            foucs : ( call_back_function = null , ...args ) => {
 
+                // call_back_function must be function
+                if(typeof(call_back_function) == "function"){
+                                    
+                    // save call_back_function and it's arguments
+                    this.#env.foucs.call_back_function = call_back_function;
+                    this.#env.foucs.call_back_args = args;
+
+                }
+                else{ // mean call_back_function is not function 
+                    console.error("[DESKTOPjs] parameter 'call_back_function' must be function");
+                }
             },
 
             // ============ need work ============
-            blur : () => {
+            blur : ( call_back_function = null , ...args ) => {
+
+                // call_back_function must be function
+                if(typeof(call_back_function) == "function"){
+                                                    
+                    // save call_back_function and it's arguments
+                    this.#env.blur.call_back_function = call_back_function;
+                    this.#env.blur.call_back_args = args;
+
+                }
+                else{ // mean call_back_function is not function 
+                    console.error("[DESKTOPjs] parameter 'call_back_function' must be function");
+                }
 
             },
 
@@ -514,6 +570,7 @@ export class window{
             },
         }
 
+
         // object provides all possible needed values public or private 
         this.get = { 
             x : () => {
@@ -619,8 +676,8 @@ export class window{
         }
 
         
+
         // *** important process before the end ***
-        
         // call build function for building this window
         this.#build(where_to_append , html_template);
 

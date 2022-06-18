@@ -6,43 +6,49 @@ export class desktop{
     // === private properties ===
     #desktop_html = null;
 
-    // "desktop_html_id" we need html element , that tell us where we should work  
+    // ENV object like sitting , where variables like "icons size" and more ...
+    #env = {
+
+        // where all desktop variables get stored for usage
+        desktop : { 
+
+        },
+
+        // where all templates get stored for usage
+        templates : {
+
+            window : {
+                html : null ,
+            }   
+
+        },
+
+    }
+
+
+    
+    // desktop_html_id : html element id "where this desktop should be"
     constructor( desktop_html_id = null){
+        //debugger
 
-        // try to select target desktop
-        this.#desktop_html = document.querySelector(`#${desktop_html_id}`);
+        // id must be string
+        if( typeof(desktop_html_id) === "string" ){
+            
+            // try to select target html element
+            this.#desktop_html = document.querySelector(`#${desktop_html_id}`);
+            
+            // check if selection is "null"
+            if( !(this.#desktop_html) ){
 
-        // check if desktop_html is valid or not
-        if( !(this.#desktop_html) ){
+                // if not
+                // default selection will be the "html body"
+                this.#desktop_html = document.body;
 
-            // if not
-            // default selection will be the "html body"
-            this.#desktop_html = document.body;
-
-            // log warn and help
-            console.warn(`[DESKTOPjs] 'desktop html element id' you pass in not found or invalid , because parameter desktop_html_id is ${desktop_html_id}`);
-            console.info(`[DESKTOPjs] default selection will be the "html body"`);
-           
-        }
-
-
-        // ENV object like sitting , where variables like "icons size" and more ...
-        this.env = {
-
-            // where all desktop variables get stored for usage
-            desktop : { 
-
-            },
-
-            // where all templates get stored for usage
-            templates : {
-
-                window : {
-                    html : null ,
-                    css  : null ,
-                }   
-
-            },
+                // log warn and help
+                console.warn(`[DESKTOPjs] 'desktop html element id' you pass in not found or invalid , because parameter desktop_html_id is ${desktop_html_id}`);
+                console.info(`[DESKTOPjs] default selection will be the "html body"`);
+            
+            }
 
         }
 
@@ -60,32 +66,33 @@ export class desktop{
             // make new window
             window : (
                 id = "def" , title = "window" , x = 10, y = 10 , height = 512, width = 512 , 
-                focus = true , maximise_button = true , minimise_button = true , visible = true , 
-                resize_in_horizontal = true , resize_in_vertical = true , where_to_append = null
+                maximise_button = true , minimise_button = true , visible = true , 
+                resize_in_horizontal = true , resize_in_vertical = true
             ) => {
+                //debugger
 
                 // if window html template not defined yet
-                if(!this.env.templates.window.html){
+                if(!this.#env.templates.window.html){
                     
                     console.error(`[DESKTOPjs] error while constructing window , because there's no html template for windows .`);
                     console.hint(`[DESKTOPjs] use '.set.window.html' function in desktop object to solve this problem .`);
-                   
+                    
                     return null;
                 }
 
                 // make new window only if id "string" & id is "not reserved"
                 //if(this.running[id] == undefined || this.running[id] == null){
-                if( typeof(id) == "string" && !this.running.windows[id] ){
+                if( typeof(id) === "string" && !this.running.windows[id] ){
 
                     // define new window 
                     this.running.windows[id] = new window(
-                        id , title , x , y , height , width , focus ,
+                        id , title , x , y , height , width ,
                         maximise_button ,
                         minimise_button,visible , 
                         resize_in_horizontal ,
                         resize_in_vertical ,
                         this.#desktop_html ,
-                        this.env.templates.window.html
+                        this.#env.templates.window.html 
                     );
                     
                     // then return it reference
@@ -107,6 +114,7 @@ export class desktop{
 
         },
 
+        
         // object responsible for any changes in any html & css template
         this.set = {
 
@@ -129,33 +137,6 @@ export class desktop{
             // window object for set HTML/CSS templates
             window : {
 
-                // set css template for window
-                // css_style_as_string => css for the hole window and all of it's children 
-                css : (css_style_as_string = "") =>{
-
-                    try{
-                        // if there's no style make a new one 
-                        let styleElement = document.querySelector("#window_style") || document.createElement("style"); 
-                        // set id if there's no id
-                        if(styleElement.id != "window_style") {
-                            styleElement.id = "window_style";
-                            console.warn("[DESKTOPjs] generating new style for window ...");
-                        }
-
-                        // set new style to the DOM & ENV
-                        styleElement.textContent = css_style_as_string;
-                        document.body.append(styleElement);
-                        this.env.templates.window.css = styleElement;
-
-                        return true;
-                    }
-                    catch(err){
-                        console.error(`[DESKTOPjs] set style for window tempaltes error : ${err} .`);
-                        return false;
-                    }
-
-                },
-
                 // set html template for window
                 // html_template_as_string : template string contain all 
                 html : (html_template_as_string = "") => {
@@ -169,7 +150,7 @@ export class desktop{
                         return false;
                     }
                     // set new template to ENV
-                    this.env.templates.window.html = parsed_html;
+                    this.#env.templates.window.html = parsed_html;
                     return true;
 
                 },
@@ -178,16 +159,13 @@ export class desktop{
 
         }
 
-        // object provide all elements "html & css" parts  
+        // desktop.get : object provide all possible values 
         this.get = {
 
-            // get window HTML template & css <style> 
+            // get window HTML template 
             window : {
                 html : () => {
-                    return this.env.templates.window.html;
-                },
-                css : () => {
-                    return this.env.templates.window.css; 
+                    return this.#env.templates.window.html;
                 }
             },
 
