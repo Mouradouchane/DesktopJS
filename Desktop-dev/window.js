@@ -22,7 +22,7 @@ export class window{
     #focus;
 
     // env object for window sitting's "private"
-    #env = {
+    env = {
         
         // drag events : call_back's and arg's and ...
         drag : {
@@ -66,12 +66,6 @@ export class window{
             call_back_args : [],
         },
 
-        // blur event callback & args
-        blur : {
-            call_back_function : null,
-            call_back_args : [],
-        },
-        
     }
 
 
@@ -84,6 +78,7 @@ export class window{
         // trying locate all window HTML Elements ===============================
         this.dom.container = this.dom.window.querySelectorAll(".container")[0]; // mandatory 
         this.dom.top_bar = this.dom.window.querySelectorAll(".top_bar")[0];  // mandatory 
+        
         // top_bar elements
         if( this.dom.top_bar ){
             this.dom.title = this.dom.top_bar.querySelectorAll(".title")[0];
@@ -197,32 +192,34 @@ export class window{
 
         // setup window functionalities & events =====================================
 
-        // setup drag/drag_start/drag_end event 
+        // setup drag/drag_start/drag_end events
         this.dom.top_bar.addEventListener("mousedown" , (e) => {
             e.preventDefault();
             //debugger
             
             // activate drag boolean
-            this.#env.drag.is_window_in_drag = true;
+            this.env.drag.is_window_in_drag = true;
 
             // this window in drag event need to be in the top of all other windows 
             // set index to the max_index + 1 
+                    
+            debugger
+            // run only if call_back_function valid function and window not in foucs
+            if( typeof(this.env.foucs.call_back_function) == "function" && this.is.foucs() == false ){
+                // call event function
+                this.env.foucs.call_back_function( this , e , ...(this.env.foucs.call_back_args) );
+            }
+
+            // check index & update it to max_index if needed
             if(this.#index < window.max_index){
                 window.max_index += 1;
                 this.dom.window.style.zIndex = window.max_index;
-            } 
-
-            debugger
-            // run only if call_back_function valid & window not in foucs
-            if( this.#env.foucs.call_back_function && !(this.is.foucs()) ){
-                // call event function
-                this.#env.foucs.call_back_function( this , e , ...(this.#env.foucs.call_back_args) );
             }
+            
 
             // switch to foucs on 
-            this.#focus = true;
+            // this.#focus = true;
 
-            
             // get mouse x & y
             let mouse_x = e.clientX;
             let mouse_y = e.clientY;
@@ -233,7 +230,7 @@ export class window{
             document.onmousemove =  ( e ) => { // in middle of "drag" 
                 e.preventDefault();
 
-                if( this.#env.drag.is_window_in_drag ){ // if window in is really in drag
+                if( this.env.drag.is_window_in_drag ){ // if window in is really in drag
                 
                     // calculate the new mouse position
                     let new_mouse_x = mouse_x - e.clientX;
@@ -247,17 +244,17 @@ export class window{
                     this.set.y(this.dom.window.offsetTop  - new_mouse_y);
 
                     // if there's call_back_function for "drag" 
-                    if(this.#env.drag.in.call_back_function){
+                    if(this.env.drag.in.call_back_function){
                         // run it and pass (window , event , and some optional args)
-                        this.#env.drag.in.call_back_function( this , e , ...(this.#env.drag.in.call_back_args) )
+                        this.env.drag.in.call_back_function( this , e , ...(this.env.drag.in.call_back_args) )
                     } 
                 }
-        };
+            };
      
         // if there's call_back_function for "drag_start" 
-        if(this.#env.drag.start.call_back_function){
+        if(this.env.drag.start.call_back_function){
             // run it and pass (window , event , and some optional args , if available)
-            this.#env.drag.start.call_back_function(this , e , ...(this.#env.drag.start.call_back_args) )
+            this.env.drag.start.call_back_function(this , e , ...(this.env.drag.start.call_back_args) )
         } 
 
         });
@@ -266,16 +263,15 @@ export class window{
         this.dom.top_bar.addEventListener("mouseup", (e) => {
             
             // switch to drag off
-            this.#env.drag.is_window_in_drag  = false;
-            this.#focus = false;
+            this.env.drag.is_window_in_drag  = false;
             
             // drop window
             document.onmousemove = null;
 
             // if there's call_back_function for "drag_end" 
-            if( this.#env.drag.end.call_back_function ){
+            if( this.env.drag.end.call_back_function ){
                 // run it and pass (window , event , and some optional args , if available)
-                this.#env.drag.end.call_back_function(this , e , ...(this.#env.drag.end.call_back_args) )
+                this.env.drag.end.call_back_function(this , e , ...(this.env.drag.end.call_back_args) )
             } 
 
         });
@@ -286,9 +282,9 @@ export class window{
             //debugger
             
             // run only if call_back_function valid & window not in foucs
-            if( this.#env.foucs.call_back_function && !this.is.foucs() ){
+            if( this.env.foucs.call_back_function && this.is.blur() ){
                 // call event function
-                this.#env.foucs.call_back_function( this , e , ...(this.#env.foucs.call_back_args) );
+                this.env.foucs.call_back_function( this , e , ...(this.env.foucs.call_back_args) );
             }
 
             // this window in drag event need to be in the top of all other windows 
@@ -298,8 +294,7 @@ export class window{
                 this.dom.window.style.zIndex = window.max_index;
             } 
  
-            // switch to foucs on 
-            this.#focus = true;
+            // this.#focus = true;
         })
 
 
@@ -325,7 +320,7 @@ export class window{
         this.#id        = (typeof(id) == "string") ? id : null;
         this.#visible   = (typeof(visible) == "boolean") ? visible : true;
         this.#title     = (typeof(title) == "string") ? title : null;
-        this.#focus     = (typeof(focus) == "boolean") ? focus : true; 
+        this.#focus     = true; 
         this.#maximize  = (typeof(maximize_button) == "boolean") ? maximize_button : true;
         this.#minimize  = (typeof(minimize_button) == "boolean") ? minimize_button : true;
         this.#resize_h  = (typeof(resize_in_horizontal) == "boolean") ? resize_in_horizontal : true;
@@ -340,7 +335,7 @@ export class window{
             
             // for check if this window in drag right now or not  
             in_drag : () => {
-                return this.#env.drag.is_window_in_drag;
+                return this.env.drag.is_window_in_drag;
             },
 
             open : () => {
@@ -352,20 +347,15 @@ export class window{
             },
 
             foucs : () => {
-                //debugger;
+                debugger
 
-                this.#focus = (this.get.z_index() >= window.max_index);
-                return this.#focus;
-                
+                this.#focus = ( this.get.z_index() >= window.max_index );
+                return this.#focus;       
             },
             
             // ============ need work ============
-            blur : () => {
-                //debugger;
-    
-                this.#focus = (this.get.z_index() >= window.max_index);
-                return !this.#focus;
-                
+            blur : () => {     
+                return !( this.is.foucs() );         
             },
 
             // ============ need work ============
@@ -390,8 +380,8 @@ export class window{
                 if(typeof(call_back_function) == "function"){
                                     
                     // save call_back_function and it's arguments
-                    this.#env.drag.start.call_back_function = call_back_function;
-                    this.#env.drag.start.call_back_args = args;
+                    this.env.drag.start.call_back_function = call_back_function;
+                    this.env.drag.start.call_back_args = args;
 
                 }
                 else{ // mean call_back_function is not function 
@@ -407,8 +397,8 @@ export class window{
                 if(typeof(call_back_function) == "function"){
                     
                     // save call_back_function and it's arguments
-                    this.#env.drag.in.call_back_function = call_back_function;
-                    this.#env.drag.in.call_back_args = args;
+                    this.env.drag.in.call_back_function = call_back_function;
+                    this.env.drag.in.call_back_args = args;
 
                 }
                 else{ // mean call_back_function is not function 
@@ -423,8 +413,8 @@ export class window{
                 if(typeof(call_back_function) == "function"){
                     
                     // save call_back_function and it's arguments
-                    this.#env.drag.end.call_back_function = call_back_function;
-                    this.#env.drag.end.call_back_args = args;
+                    this.env.drag.end.call_back_function = call_back_function;
+                    this.env.drag.end.call_back_args = args;
 
                 }
                 else{ // mean call_back_function is not function 
@@ -439,8 +429,8 @@ export class window{
                 if(typeof(call_back_function) == "function"){
                                     
                     // save call_back_function and it's arguments
-                    this.#env.foucs.call_back_function = call_back_function;
-                    this.#env.foucs.call_back_args = args;
+                    this.env.foucs.call_back_function = call_back_function;
+                    this.env.foucs.call_back_args = args;
 
                 }
                 else{ // mean call_back_function is not function 
@@ -448,22 +438,6 @@ export class window{
                 }
             },
 
-            // ============ need work ============
-            blur : ( call_back_function = null , ...args ) => {
-
-                // call_back_function must be function
-                if(typeof(call_back_function) == "function"){
-                                                    
-                    // save call_back_function and it's arguments
-                    this.#env.blur.call_back_function = call_back_function;
-                    this.#env.blur.call_back_args = args;
-
-                }
-                else{ // mean call_back_function is not function 
-                    console.error("[DESKTOPjs] parameter 'call_back_function' must be function");
-                }
-
-            },
 
             // ============ need work ============
             maximize : () => {
@@ -606,7 +580,7 @@ export class window{
             },
 
             z_index : () => {
-                return this.dom.window.style.zIndex;
+                return Number.parseInt(this.dom.window.style.zIndex);
             },
 
             // function return object contain a few available "values" 
@@ -675,7 +649,6 @@ export class window{
             
         }
 
-        
 
         // *** important process before the end ***
         // call build function for building this window
