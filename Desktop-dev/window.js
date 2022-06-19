@@ -8,18 +8,28 @@ export class window{
 
     // === private properties ===
     #id;
+
     #x;
     #y;
+    #old_x;
+    #old_y;
+
     #height;
     #width;
+    #old_width;
+    #old_height;
+
     #visible;
-    #minimize;
+    #hide; 
     #maximize;
+    #maxi_or_mini;
+
     #title;
     #resize_h;
     #resize_v;
+    #focus = true;
     #index = window.index += 1;
-    #focus;
+    #parent_html = null;
 
     // env object for window sitting's "private"
     env = {
@@ -105,47 +115,42 @@ export class window{
         
 
         // check if some mandatory or required element missing =====================
-        if(!this.dom.container){
+        if( !(this.dom.container) || !(this.dom.top_bar) ){
             console.error(`[DESKTOPjs] error in window ${this.#id} , because missing mandatory element "container" .`);
             console.info(`[DESKTOPjs] in window html template you need to make html element with class "container" .`);
             
             return;
         }
-        if(!this.dom.top_bar){
-            console.error(`[DESKTOPjs] error in window ${this.#id} , because missing mandatory element "top_bar" .`);
-            console.info(`[DESKTOPjs] in window html template you need to make html element with class "top_bar" .`);
-            
+
+        if( !(this.dom.resize_t) || !(this.dom.resize_b) ){
+            if( this.#resize_v ){
+                console.error(`[DESKTOPjs] error in window ${this.#id} , because "resize_v" option is activated , but there's no html elements for it .`);
+                console.info(`[DESKTOPjs] modifiy your window html template and put two html element with class "resize_vertical" .`)
+            }
+            if( this.#resize_h ){
+                console.error(`[DESKTOPjs] error in window ${this.#id} , because "resize_h" option is activated , but there's no html elements for it `);
+                console.info(`[DESKTOPjs] modifiy your window html template and put two html element with class "resize_horizontal" .`)
+            } 
             return;
         }
-        if( this.#resize_v  && !this.dom.resize_t || !this.dom.resize_b ){
-            console.error(`[DESKTOPjs] error in window ${this.#id} , because "resize_v" option is activated , but there's no html elements for it .`);
-            console.info(`[DESKTOPjs] modifiy your window html template and put two html element with class "resize_vertical" .`)
-            
-            return;
-        }
-        if( this.#resize_h  && !this.dom.resize_l || !this.dom.resize_r ){
-            console.error(`[DESKTOPjs] error in window ${this.#id} , because "resize_h" option is activated , but there's no html elements for it `);
-            console.info(`[DESKTOPjs] modifiy your window html template and put two html element with class "resize_horizontal" .`)
-            
-            return;
-        }
+ 
         // end of "checks" =========================================================
 
                 
         // filter no needed elements ===============================================
 
         // if no needed to minimize button
-        if(!(this.#minimize)){
+        if( !(this.#hide) ){
             this.dom.minimize.parentNode.removeChild(this.dom.minimize);
             this.dom.minimize = null;
         }
         // if no needed to maximize button
-        if(!(this.#maximize)){
+        if( !(this.#maximize) ){
             this.dom.maximize.parentNode.removeChild(this.dom.maximize);
             this.dom.maximize = null;
         }
         // if no needed to resize_h
-        if( !this.#resize_h ){
+        if( !(this.#resize_h) ){
             this.dom.resize_l.parentNode.removeChild(this.dom.resize_l);
             this.dom.resize_r.parentNode.removeChild(this.dom.resize_r);
 
@@ -153,7 +158,7 @@ export class window{
             this.dom.resize_r = null;
         }
         // if no needed to resize_v
-        if( !this.#resize_v ){
+        if( !(this.#resize_v) ){
             this.dom.resize_t.parentNode.removeChild(this.dom.resize_t);
             this.dom.resize_b.parentNode.removeChild(this.dom.resize_b);
             
@@ -183,7 +188,7 @@ export class window{
         this.dom.window.style.cssText +=  `top  : ${this.#y}px`;
         this.dom.window.style.cssText +=  `width  : ${this.#width}px`;
         this.dom.window.style.cssText +=  `height  : ${this.#height}px`;
-        this.dom.window.style.cssText +=  `visibility  : ${ (this.#visible) ? "visible" : "hidden"}`;
+        this.dom.window.style.cssText +=  `visibility  : ${ (this.#visible) ? "visible" : "hidden" }`;
         this.dom.window.style.zIndex = this.#index;
         window.max_index += 1;
         
@@ -195,7 +200,7 @@ export class window{
         // setup drag/drag_start/drag_end events
         this.dom.top_bar.addEventListener("mousedown" , (e) => {
             e.preventDefault();
-            //debugger
+            // debugger
             
             // activate drag boolean
             this.env.drag.is_window_in_drag = true;
@@ -203,7 +208,7 @@ export class window{
             // this window in drag event need to be in the top of all other windows 
             // set index to the max_index + 1 
                     
-            debugger
+            // debugger
             // run only if call_back_function valid function and window not in foucs
             if( typeof(this.env.foucs.call_back_function) == "function" && this.is.foucs() == false ){
                 // call event function
@@ -298,17 +303,39 @@ export class window{
         })
 
 
+        // setup maximize minimize click event 
+        // only if button maximize allowed
+        if(this.#maximize && this.dom.maximize){
+
+            this.dom.maximize.addEventListener("click" , () => {
+                debugger
+                   
+                if( this.#maxi_or_mini ){
+                    this.set.minimize();
+                }
+                else{
+                    this.set.maximize();
+                }
+            });
+
+        }
+
+
         // end of "setup functionalities & events" ========================================
 
-
         // append this new window to the current desktop
-        if(where_to_append) where_to_append.append(this.dom.window);
+        if(where_to_append){
+           
+            if(this.#maxi_or_mini) this.set.maximize();
+            where_to_append.append(this.dom.window);
+
+        } 
     }
 
     constructor(
         id = null , title = "window" , x = 10, y = 10 , height = 512, width = 512 , 
-        maximize_button = true , minimize_button = true , 
-        visible = true , resize_in_horizontal = true , resize_in_vertical = true , 
+        maximize_button = true , hide_button = true , 
+        visible = true , resize_in_horizontal = true , resize_in_vertical = true , maximized = false, 
         where_to_append = null , html_template = null 
     ){
 
@@ -318,17 +345,18 @@ export class window{
         this.#height    = (typeof(height) == "number") ? height : 0;
         this.#width     = (typeof(width) == "number") ? width : 0;
         this.#id        = (typeof(id) == "string") ? id : null;
-        this.#visible   = (typeof(visible) == "boolean") ? visible : true;
+        this.#visible   =  visible ? true : false;
         this.#title     = (typeof(title) == "string") ? title : null;
-        this.#focus     = true; 
-        this.#maximize  = (typeof(maximize_button) == "boolean") ? maximize_button : true;
-        this.#minimize  = (typeof(minimize_button) == "boolean") ? minimize_button : true;
-        this.#resize_h  = (typeof(resize_in_horizontal) == "boolean") ? resize_in_horizontal : true;
-        this.#resize_v  = (typeof(resize_in_vertical) == "boolean") ? resize_in_vertical : true;
-        
-
+        this.#maximize  = maximize_button ? true : false;
+        this.#hide  = hide_button ? true : false;
+        this.#resize_h  = resize_in_horizontal ? true : false;
+        this.#resize_v  = resize_in_vertical ? true : false;
+        this.#maxi_or_mini = (maximized) ? true : false;
+        this.#parent_html = where_to_append;
         // provide html elements of that element
-        this.dom = { }
+        this.dom = { 
+
+        }
 
         // object provide booleans represents the case of object
         this.is  = { 
@@ -347,7 +375,7 @@ export class window{
             },
 
             foucs : () => {
-                debugger
+                //debugger
 
                 this.#focus = ( this.get.z_index() >= window.max_index );
                 return this.#focus;       
@@ -440,13 +468,36 @@ export class window{
 
 
             // ============ need work ============
-            maximize : () => {
+            maximize : ( call_back_function = null , ...args ) => {
+
+                // call_back_function must be function
+                if(typeof(call_back_function) == "function"){
+                                                    
+                    // save call_back_function and it's arguments
+                    this.env.maximize.call_back_function = call_back_function;
+                    this.env.maximize.call_back_args = args;
+
+                }
+                else{ // mean call_back_function is not function 
+                    console.error("[DESKTOPjs] parameter 'call_back_function' must be function");
+                }
 
             },
 
             // ============ need work ============
-            minimize : () => {
+            minimize : ( call_back_function = null , ...args ) => {
 
+                // call_back_function must be function
+                if(typeof(call_back_function) == "function"){
+                                                                    
+                    // save call_back_function and it's arguments
+                    this.env.minimize.call_back_function = call_back_function;
+                    this.env.minimize.call_back_args = args;
+
+                }
+                else{ // mean call_back_function is not function 
+                    console.error("[DESKTOPjs] parameter 'call_back_function' must be function");
+                }
             }
         }
 
@@ -499,7 +550,7 @@ export class window{
 
             // add or replace class_name to all elements in window
             class  : ( class_name = "" , old_class_name = "", replace = false) => {
-                debugger
+                // debugger
 
                 if( typeof(class_name) !== "string" ){
                     console.error( "parameter 'class_name' in class function must be 'string' ." );
@@ -530,6 +581,75 @@ export class window{
                 
                 this.#visible = ( is_visible ? true : false );
                 this.dom.window.style.cssText +=  `visibility  : ${ (this.#visible) ? "visible" : "hidden"}`;
+
+            },
+
+            // set this window top index
+            top_index : () => {
+
+                window.max_index += 1;
+                this.dom.window.style.zIndex = window.max_index;
+
+            },
+
+            // 
+            maximize : ( e = null ) => {
+                // debugger
+
+                // get task_bar if there's task_bar in desktop
+                let task_bar = this.#parent_html.querySelector("#taskbar");
+                
+                // save old "x y" and" width height" for minimize later 
+                this.#old_x = this.#x;
+                this.#old_y = this.#y;
+
+                this.#old_width  = this.#width;
+                this.#old_height = this.#height;
+                
+                this.dom.window.style.cssText = `
+                    top    : 0px;
+                    left   : 0px;
+                    width  : 100%;
+                    height : calc( 100% - ${ Number.parseFloat( (task_bar) ? task_bar.clientHeight : 0 ) }px );
+                `;
+
+                // toggle to maximized
+                this.#maxi_or_mini = true;
+                // set top z-index to this window
+                this.set.top_index();
+
+                // if there's call_back_function for maximize event , run it
+                if( typeof(this.env.maximize.call_back_function) === "function" ){
+
+                    this.env.maximize.call_back_function( this , e , ...this.env.maximize.call_back_args );
+
+                } 
+            },
+
+            minimize : ( e = null ) => {
+
+                this.#x = this.#old_x;
+                this.#y = this.#old_y;
+
+                this.#width  = this.#old_width;
+                this.#height = this.#old_height;
+                
+                this.dom.window.style.cssText = `
+                    top    : ${this.#x}px;
+                    left   : ${this.#x}px;
+                    width  : ${this.#width}px;
+                    height : ${this.#height}px;
+                `;
+
+                // toggle to minimize 
+                this.#maxi_or_mini = false;
+                
+                // if there's call_back_function for maximize event , run it
+                if( typeof(this.env.minimize.call_back_function) === "function" ){
+
+                    this.env.minimize.call_back_function( this , e , ...this.env.minimize.call_back_args );
+
+                } 
 
             },
 

@@ -67,7 +67,7 @@ export class desktop{
             window : (
                 id = "def" , title = "window" , x = 10, y = 10 , height = 512, width = 512 , 
                 maximise_button = true , minimise_button = true , visible = true , 
-                resize_in_horizontal = true , resize_in_vertical = true
+                resize_in_horizontal = true , resize_in_vertical = true , maximized = false, 
             ) => {
                 //debugger
 
@@ -90,7 +90,7 @@ export class desktop{
                         maximise_button ,
                         minimise_button,visible , 
                         resize_in_horizontal ,
-                        resize_in_vertical ,
+                        resize_in_vertical , maximized ,
                         this.#desktop_html ,
                         this.#env.templates.window.html 
                     );
