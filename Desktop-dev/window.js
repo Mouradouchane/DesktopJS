@@ -198,17 +198,18 @@ export class window{
         // setup window functionalities & events =====================================
 
         // setup drag/drag_start/drag_end events
+
         this.dom.top_bar.addEventListener("mousedown" , (e) => {
             e.preventDefault();
-            // debugger
             
-            // activate drag boolean
+            // debugger
+
+            // activate drag boolean & miniminze
             this.env.drag.is_window_in_drag = true;
 
             // this window in drag event need to be in the top of all other windows 
             // set index to the max_index + 1 
                     
-            // debugger
             // run only if call_back_function valid function and window not in foucs
             if( typeof(this.env.foucs.call_back_function) == "function" && this.is.foucs() == false ){
                 // call event function
@@ -220,16 +221,12 @@ export class window{
                 window.max_index += 1;
                 this.dom.window.style.zIndex = window.max_index;
             }
-            
-
-            // switch to foucs on 
-            // this.#focus = true;
 
             // get mouse x & y
             let mouse_x = e.clientX;
             let mouse_y = e.clientY;
 
-
+   
             // set mousemove event to the document for keep tracking dragged window
             // if drag boolean is activated
             document.onmousemove =  ( e ) => { // in middle of "drag" 
@@ -248,6 +245,7 @@ export class window{
                     this.set.x(this.dom.window.offsetLeft - new_mouse_x);
                     this.set.y(this.dom.window.offsetTop  - new_mouse_y);
 
+
                     // if there's call_back_function for "drag" 
                     if(this.env.drag.in.call_back_function){
                         // run it and pass (window , event , and some optional args)
@@ -256,17 +254,17 @@ export class window{
                 }
             };
      
-        // if there's call_back_function for "drag_start" 
-        if(this.env.drag.start.call_back_function){
-            // run it and pass (window , event , and some optional args , if available)
-            this.env.drag.start.call_back_function(this , e , ...(this.env.drag.start.call_back_args) )
-        } 
+            // if there's call_back_function for "drag_start" 
+            if(this.env.drag.start.call_back_function){
+                // run it and pass (window , event , and some optional args , if available)
+                this.env.drag.start.call_back_function(this , e , ...(this.env.drag.start.call_back_args) )
+            } 
 
         });
 
         // when "drag end"
         this.dom.top_bar.addEventListener("mouseup", (e) => {
-            
+            debugger
             // switch to drag off
             this.env.drag.is_window_in_drag  = false;
             
@@ -303,25 +301,29 @@ export class window{
         })
 
 
-        // setup maximize minimize click event 
-        // only if button maximize allowed
-        if(this.#maximize && this.dom.maximize){
-
-            this.dom.maximize.addEventListener("click" , () => {
-                debugger
-                   
-                if( this.#maxi_or_mini ){
-                    this.set.minimize();
-                }
-                else{
-                    this.set.maximize();
-                }
-            });
+        let maxi_or_mini = () => {
+               
+            if( this.#maxi_or_mini ){
+                this.set.minimize();
+            }
+            else{
+                this.set.maximize();
+            }
 
         }
 
+        // "maximize minimize" click event on maximize button
+        if(this.#maximize && this.dom.maximize){
+            this.dom.maximize.addEventListener("click" , maxi_or_mini);
+        }
+
+        // "maximize minimize" double-click event on top_bar 
+        this.dom.top_bar.addEventListener("dblclick" , maxi_or_mini);
+
 
         // end of "setup functionalities & events" ========================================
+
+
 
         // append this new window to the current desktop
         if(where_to_append){
@@ -381,19 +383,16 @@ export class window{
                 return this.#focus;       
             },
             
-            // ============ need work ============
             blur : () => {     
                 return !( this.is.foucs() );         
             },
 
-            // ============ need work ============
             maximize : () => {
-
+                return this.#maxi_or_mini;
             },
 
-            // ============ need work ============
             minimize : () => {
-
+                return !( this.#maxi_or_mini );
             }
 
         }
@@ -532,6 +531,39 @@ export class window{
                 }
             },
 
+            // set new width 
+            width : ( new_width = 0) => {
+                // check value
+                if( typeof(new_width) === "number"){
+
+                    this.#old_width = this.#width;
+                    this.#width = new_width; // set new value if it valid
+                    this.dom.window.style.width = this.#width + "px";
+                    
+                    return true; // confirmation 
+                }
+                else { // mean invalid value
+                    console.warn("[DESKTOPjs] new_x parameter must be number ")
+                    return false; // confirmation 
+                }
+            },
+            // set new width 
+            height : ( new_height = 0) => {
+                // check value
+                if( typeof(new_height) === "number"){
+
+                    this.#old_height = this.#height;
+                    this.#height = new_height; // set new value if it valid
+                    this.dom.window.style.height = this.#height + "px";
+                    
+                    return true; // confirmation 
+                }
+                else { // mean invalid value
+                    console.warn("[DESKTOPjs] new_x parameter must be number ")
+                    return false; // confirmation 
+                }
+            },
+
             // set new window title 
             title : ( new_title = "" ) => {
 
@@ -627,19 +659,20 @@ export class window{
             },
 
             minimize : ( e = null ) => {
-
-                this.#x = this.#old_x;
-                this.#y = this.#old_y;
+                debugger
 
                 this.#width  = this.#old_width;
                 this.#height = this.#old_height;
                 
                 this.dom.window.style.cssText = `
-                    top    : ${this.#x}px;
+                    top    : ${this.#y}px;
                     left   : ${this.#x}px;
                     width  : ${this.#width}px;
                     height : ${this.#height}px;
                 `;
+ 
+                // set top z-index to this window
+                this.set.top_index();
 
                 // toggle to minimize 
                 this.#maxi_or_mini = false;
