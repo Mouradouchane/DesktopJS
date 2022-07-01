@@ -7,29 +7,31 @@ export class window{
     static max_index = 0;
 
     // === private properties ===
-    #id;
+    #private = {
+        id: null ,
 
-    #x;
-    #y;
-    #old_x;
-    #old_y;
+        x: null ,
+        y: null ,
+        old_x: null ,
+        old_y: null ,
 
-    #height;
-    #width;
-    #old_width;
-    #old_height;
+        height: null ,
+        width: null ,
+        old_width: null ,
+        old_height: null ,
 
-    #visible;
-    #hide; 
-    #maximize;
-    #maxi_or_mini;
+        visible: null ,
+        hide: null ,
+        maximize: null ,
+        maxi_or_mini: null ,
 
-    #title;
-    #resize_h;
-    #resize_v;
-    #focus = true;
-    #index = window.index += 1;
-    #parent_html = null;
+        title: null ,
+        resize_h: null ,
+        resize_v: null ,
+        focus: true,
+        index: window.index += 1,
+        parent_html: null,
+    }
 
     // env object for window sitting's "private"
     env = {
@@ -116,19 +118,19 @@ export class window{
 
         // check if some mandatory or required element missing =====================
         if( !(this.dom.container) || !(this.dom.top_bar) ){
-            console.error(`[DESKTOPjs] error in window ${this.#id} , because missing mandatory element "container" .`);
+            console.error(`[DESKTOPjs] error in window ${this.#private.id} , because missing mandatory element "container" .`);
             console.info(`[DESKTOPjs] in window html template you need to make html element with class "container" .`);
             
             return;
         }
 
         if( !(this.dom.resize_t) || !(this.dom.resize_b) ){
-            if( this.#resize_v ){
-                console.error(`[DESKTOPjs] error in window ${this.#id} , because "resize_v" option is activated , but there's no html elements for it .`);
+            if( this.#private.resize_v ){
+                console.error(`[DESKTOPjs] error in window ${this.#private.id} , because "resize_v" option is activated , but there's no html elements for it .`);
                 console.info(`[DESKTOPjs] modifiy your window html template and put two html element with class "resize_vertical" .`)
             }
-            if( this.#resize_h ){
-                console.error(`[DESKTOPjs] error in window ${this.#id} , because "resize_h" option is activated , but there's no html elements for it `);
+            if( this.#private.resize_h ){
+                console.error(`[DESKTOPjs] error in window ${this.#private.id} , because "resize_h" option is activated , but there's no html elements for it `);
                 console.info(`[DESKTOPjs] modifiy your window html template and put two html element with class "resize_horizontal" .`)
             } 
             return;
@@ -140,17 +142,17 @@ export class window{
         // filter no needed elements ===============================================
 
         // if no needed to minimize button
-        if( !(this.#hide) ){
+        if( !(this.#private.hide) ){
             this.dom.minimize.parentNode.removeChild(this.dom.minimize);
             this.dom.minimize = null;
         }
         // if no needed to maximize button
-        if( !(this.#maximize) ){
+        if( !(this.#private.maximize) ){
             this.dom.maximize.parentNode.removeChild(this.dom.maximize);
             this.dom.maximize = null;
         }
         // if no needed to resize_h
-        if( !(this.#resize_h) ){
+        if( !(this.#private.resize_h) ){
             this.dom.resize_l.parentNode.removeChild(this.dom.resize_l);
             this.dom.resize_r.parentNode.removeChild(this.dom.resize_r);
 
@@ -158,7 +160,7 @@ export class window{
             this.dom.resize_r = null;
         }
         // if no needed to resize_v
-        if( !(this.#resize_v) ){
+        if( !(this.#private.resize_v) ){
             this.dom.resize_t.parentNode.removeChild(this.dom.resize_t);
             this.dom.resize_b.parentNode.removeChild(this.dom.resize_b);
             
@@ -166,7 +168,7 @@ export class window{
             this.dom.resize_b = null;
         }
         // if no needed to resize in corners
-        if( !this.#resize_h || !this.#resize_v ){
+        if( !this.#private.resize_h || !this.#private.resize_v ){
             this.dom.resize_tl.parentNode.removeChild(this.dom.resize_tl);
             this.dom.resize_tr.parentNode.removeChild(this.dom.resize_tr);
             this.dom.resize_dl.parentNode.removeChild(this.dom.resize_dl);
@@ -183,17 +185,17 @@ export class window{
         // setup window elements ===================================================
         
         // window attributes and properties 
-        this.dom.window.setAttribute("id" , this.#id);
-        this.dom.window.style.cssText +=  `left : ${this.#x}px`;
-        this.dom.window.style.cssText +=  `top  : ${this.#y}px`;
-        this.dom.window.style.cssText +=  `width  : ${this.#width}px`;
-        this.dom.window.style.cssText +=  `height  : ${this.#height}px`;
-        this.dom.window.style.cssText +=  `visibility  : ${ (this.#visible) ? "visible" : "hidden" }`;
-        this.dom.window.style.zIndex = this.#index;
+        this.dom.window.setAttribute("id" , this.#private.id);
+        this.dom.window.style.cssText +=  `left : ${this.#private.x}px`;
+        this.dom.window.style.cssText +=  `top  : ${this.#private.y}px`;
+        this.dom.window.style.cssText +=  `width  : ${this.#private.width}px`;
+        this.dom.window.style.cssText +=  `height  : ${this.#private.height}px`;
+        this.dom.window.style.cssText +=  `visibility  : ${ (this.#private.visible) ? "visible" : "hidden" }`;
+        this.dom.window.style.zIndex = this.#private.index;
         window.max_index += 1;
         
         // window title
-        this.dom.title.textContent = this.#title;
+        this.dom.title.textContent = this.#private.title;
 
         // setup window functionalities & events =====================================
 
@@ -217,7 +219,7 @@ export class window{
             }
 
             // check index & update it to max_index if needed
-            if(this.#index < window.max_index){
+            if(this.#private.index < window.max_index){
                 window.max_index += 1;
                 this.dom.window.style.zIndex = window.max_index;
             }
@@ -264,7 +266,7 @@ export class window{
 
         // when "drag end"
         this.dom.top_bar.addEventListener("mouseup", (e) => {
-            debugger
+            // debugger
             // switch to drag off
             this.env.drag.is_window_in_drag  = false;
             
@@ -292,18 +294,18 @@ export class window{
 
             // this window in drag event need to be in the top of all other windows 
             // set index to the max_index + 1 
-            if(this.#index < window.max_index){
+            if(this.#private.index < window.max_index){
                 window.max_index += 1;
                 this.dom.window.style.zIndex = window.max_index;
             } 
  
-            // this.#focus = true;
+            // this.#private.focus = true;
         })
 
 
         let maxi_or_mini = () => {
                
-            if( this.#maxi_or_mini ){
+            if( this.#private.maxi_or_mini ){
                 this.set.minimize();
             }
             else{
@@ -313,7 +315,7 @@ export class window{
         }
 
         // "maximize minimize" click event on maximize button
-        if(this.#maximize && this.dom.maximize){
+        if(this.#private.maximize && this.dom.maximize){
             this.dom.maximize.addEventListener("click" , maxi_or_mini);
         }
 
@@ -328,7 +330,7 @@ export class window{
         // append this new window to the current desktop
         if(where_to_append){
            
-            if(this.#maxi_or_mini) this.set.maximize();
+            if(this.#private.maxi_or_mini) this.set.maximize();
             where_to_append.append(this.dom.window);
 
         } 
@@ -342,19 +344,19 @@ export class window{
     ){
 
         // check & set new values
-        this.#x         = (typeof(x) == "number") ? x : 0; 
-        this.#y         = (typeof(y) == "number") ? y : 0;
-        this.#height    = (typeof(height) == "number") ? height : 0;
-        this.#width     = (typeof(width) == "number") ? width : 0;
-        this.#id        = (typeof(id) == "string") ? id : null;
-        this.#visible   =  visible ? true : false;
-        this.#title     = (typeof(title) == "string") ? title : null;
-        this.#maximize  = maximize_button ? true : false;
-        this.#hide  = hide_button ? true : false;
-        this.#resize_h  = resize_in_horizontal ? true : false;
-        this.#resize_v  = resize_in_vertical ? true : false;
-        this.#maxi_or_mini = (maximized) ? true : false;
-        this.#parent_html = where_to_append;
+        this.#private.x         = (typeof(x) == "number") ? x : 0; 
+        this.#private.y         = (typeof(y) == "number") ? y : 0;
+        this.#private.height    = (typeof(height) == "number") ? height : 0;
+        this.#private.width     = (typeof(width) == "number") ? width : 0;
+        this.#private.id        = (typeof(id) == "string") ? id : null;
+        this.#private.visible   =  visible ? true : false;
+        this.#private.title     = (typeof(title) == "string") ? title : null;
+        this.#private.maximize  = maximize_button ? true : false;
+        this.#private.hide      = hide_button ? true : false;
+        this.#private.resize_h  = resize_in_horizontal ? true : false;
+        this.#private.resize_v  = resize_in_vertical ? true : false;
+        this.#private.maxi_or_mini = (maximized) ? true : false;
+        this.#private.parent_html = where_to_append;
         // provide html elements of that element
         this.dom = { 
 
@@ -369,18 +371,18 @@ export class window{
             },
 
             open : () => {
-                return this.#visible ;
+                return this.#private.visible ;
             },
 
             close : () => {
-                return this.#visible ? false : true;
+                return this.#private.visible ? false : true;
             },
 
             foucs : () => {
                 //debugger
 
-                this.#focus = ( this.get.z_index() >= window.max_index );
-                return this.#focus;       
+                this.#private.focus = ( this.get.z_index() >= window.max_index );
+                return this.#private.focus;       
             },
             
             blur : () => {     
@@ -388,11 +390,11 @@ export class window{
             },
 
             maximize : () => {
-                return this.#maxi_or_mini;
+                return this.#private.maxi_or_mini;
             },
 
             minimize : () => {
-                return !( this.#maxi_or_mini );
+                return !( this.#private.maxi_or_mini );
             }
 
         }
@@ -508,8 +510,8 @@ export class window{
             x : ( new_x = 0) => {
                 // check
                 if( typeof(new_x) == "number"){
-                    this.#x = new_x; // set new value if it valid
-                    this.dom.window.style.left = this.#x + "px";
+                    this.#private.x = new_x; // set new value if it valid
+                    this.dom.window.style.left = this.#private.x + "px";
                     return true; // return confirmation :)
                 }
                 else { // mean invalid value
@@ -521,8 +523,8 @@ export class window{
             // like x() function
             y : ( new_y = 0 ) => {
                 if( typeof(new_y) == "number"){
-                    this.#y = new_y;
-                    this.dom.window.style.top = this.#y + "px";
+                    this.#private.y = new_y;
+                    this.dom.window.style.top = this.#private.y + "px";
                     return true;
                 }
                 else {
@@ -536,9 +538,9 @@ export class window{
                 // check value
                 if( typeof(new_width) === "number"){
 
-                    this.#old_width = this.#width;
-                    this.#width = new_width; // set new value if it valid
-                    this.dom.window.style.width = this.#width + "px";
+                    this.#private.old_width = this.#private.width;
+                    this.#private.width = new_width; // set new value if it valid
+                    this.dom.window.style.width = this.#private.width + "px";
                     
                     return true; // confirmation 
                 }
@@ -552,9 +554,9 @@ export class window{
                 // check value
                 if( typeof(new_height) === "number"){
 
-                    this.#old_height = this.#height;
-                    this.#height = new_height; // set new value if it valid
-                    this.dom.window.style.height = this.#height + "px";
+                    this.#private.old_height = this.#private.height;
+                    this.#private.height = new_height; // set new value if it valid
+                    this.dom.window.style.height = this.#private.height + "px";
                     
                     return true; // confirmation 
                 }
@@ -572,8 +574,8 @@ export class window{
                     return false;
                 }
                 else {
-                    this.#title = new_title;
-                    this.dom.title.textContent = this.#title;
+                    this.#private.title = new_title;
+                    this.dom.title.textContent = this.#private.title;
 
                     return true;
                 }
@@ -611,8 +613,8 @@ export class window{
             // set visiblity function used with open & close functions
             visibility : ( is_visible = true ) => {
                 
-                this.#visible = ( is_visible ? true : false );
-                this.dom.window.style.cssText +=  `visibility  : ${ (this.#visible) ? "visible" : "hidden"}`;
+                this.#private.visible = ( is_visible ? true : false );
+                this.dom.window.style.cssText +=  `visibility  : ${ (this.#private.visible) ? "visible" : "hidden"}`;
 
             },
 
@@ -629,14 +631,14 @@ export class window{
                 // debugger
 
                 // get task_bar if there's task_bar in desktop
-                let task_bar = this.#parent_html.querySelector("#taskbar");
+                let task_bar = this.#private.parent_html.querySelector("#private.taskbar");
                 
                 // save old "x y" and" width height" for minimize later 
-                this.#old_x = this.#x;
-                this.#old_y = this.#y;
+                this.#private.old_x = this.#private.x;
+                this.#private.old_y = this.#private.y;
 
-                this.#old_width  = this.#width;
-                this.#old_height = this.#height;
+                this.#private.old_width  = this.#private.width;
+                this.#private.old_height = this.#private.height;
                 
                 this.dom.window.style.cssText = `
                     top    : 0px;
@@ -646,7 +648,7 @@ export class window{
                 `;
 
                 // toggle to maximized
-                this.#maxi_or_mini = true;
+                this.#private.maxi_or_mini = true;
                 // set top z-index to this window
                 this.set.top_index();
 
@@ -661,21 +663,21 @@ export class window{
             minimize : ( e = null ) => {
                 debugger
 
-                this.#width  = this.#old_width;
-                this.#height = this.#old_height;
+                this.#private.width  = this.#private.old_width;
+                this.#private.height = this.#private.old_height;
                 
                 this.dom.window.style.cssText = `
-                    top    : ${this.#y}px;
-                    left   : ${this.#x}px;
-                    width  : ${this.#width}px;
-                    height : ${this.#height}px;
+                    top    : ${this.#private.y}px;
+                    left   : ${this.#private.x}px;
+                    width  : ${this.#private.width}px;
+                    height : ${this.#private.height}px;
                 `;
  
                 // set top z-index to this window
                 this.set.top_index();
 
                 // toggle to minimize 
-                this.#maxi_or_mini = false;
+                this.#private.maxi_or_mini = false;
                 
                 // if there's call_back_function for maximize event , run it
                 if( typeof(this.env.minimize.call_back_function) === "function" ){
@@ -701,64 +703,53 @@ export class window{
         // object provides all possible needed values public or private 
         this.get = { 
             x : () => {
-                return this.#x;
+                return this.#private.x;
             },
 
             y : () => {
-                return this.#y;
+                return this.#private.y;
             },
 
             id : () => {
-                return this.#id;
+                return this.#private.id;
             },
 
             width : () => {
-                return this.#width;
+                return this.#private.width;
             },
 
             height : () => {
-                return this.#height;
+                return this.#private.height;
             },
 
             visibility : () => {
-                return this.#visible;
+                return this.#private.visible;
             },
         
             title : () => {
-                return this.#title;
+                return this.#private.title;
             },
 
             index : () => {
-                return this.#index;
+                return this.#private.index;
             },
 
             z_index : () => {
                 return Number.parseInt(this.dom.window.style.zIndex);
             },
 
-            // function return object contain a few available "values" 
-            values : () => {
-                
-                // object who gonna take all possible properties  
-                let values = {};
-
-                // get all possible properties using all functions in get object
-                for( let property in this.get){
-
-                    // if property name is 'all' then "skip it avoiding recursive call"
-                    if(property != "all") values[property] = this.get[property]();
-
-                }
-
-                return values;
+            // function return object contain all private "values" 
+            private_values : () => {
+                // make copy using json  
+                return JSON.parse(JSON.stringify(this.#private));
             },
             
             resize_h : () => {
-                return this.#resize_h;
+                return this.#private.resize_h;
             },
 
             resize_v : () => {
-                return this.#resize_v;
+                return this.#private.resize_v;
             },
         }
 
@@ -769,7 +760,7 @@ export class window{
         this.open  = ( call_back_function = null , ...call_back_args ) =>{ 
 
             // make window visible 'open'
-            if(!this.#visible) this.set.visibility(true);
+            if(!this.#private.visible) this.set.visibility(true);
 
             // call_back_function must be function
             if( typeof(call_back_function) === "function" ) {
@@ -789,7 +780,7 @@ export class window{
         this.close = ( call_back_function = null , ...call_back_args ) =>{
 
             // make window visible 'open'
-            if(this.#visible) this.set.visibility(false);
+            if(this.#private.visible) this.set.visibility(false);
 
             if( typeof(call_back_function) === "function" ) {
                 call_back_function(this , ...call_back_args);

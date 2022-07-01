@@ -3,46 +3,49 @@ import {window} from "./window.js";
 
 export class desktop{
 
+    
     // === private properties ===
-    #desktop_html = null;
+    #private ={
+        desktop_html : null,
 
-    // ENV object like sitting , where variables like "icons size" and more ...
-    #env = {
+        // ENV object like sitting , where variables like "icons size" and more ...
+        env : {
 
-        // where all desktop variables get stored for usage
-        desktop : { 
+            // where all desktop variables get stored for usage
+            desktop : { 
 
-        },
+            },
 
-        // where all templates get stored for usage
-        templates : {
+            // where all templates get stored for usage
+            templates : {
 
-            window : {
-                html : null ,
-            }   
+                window : {
+                    html : null ,
+                }   
 
-        },
+            },
 
+        }
     }
 
 
     
     // desktop_html_id : html element id "where this desktop should be"
-    constructor( desktop_html_id = null){
-        //debugger
+    constructor( desktop_html_id = null ){
+        // debugger
 
         // id must be string
         if( typeof(desktop_html_id) === "string" ){
             
             // try to select target html element
-            this.#desktop_html = document.querySelector(`#${desktop_html_id}`);
+            this.#private.desktop_html = document.querySelector(`#${desktop_html_id}`);
             
             // check if selection is "null"
-            if( !(this.#desktop_html) ){
+            if( !(this.#private.desktop_html) ){
 
                 // if not
                 // default selection will be the "html body"
-                this.#desktop_html = document.body;
+                this.#private.desktop_html = document.body;
 
                 // log warn and help
                 console.warn(`[DESKTOPjs] 'desktop html element id' you pass in not found or invalid , because parameter desktop_html_id is ${desktop_html_id}`);
@@ -72,7 +75,7 @@ export class desktop{
                 //debugger
 
                 // if window html template not defined yet
-                if(!this.#env.templates.window.html){
+                if(!this.#private.env.templates.window.html){
                     
                     console.error(`[DESKTOPjs] error while constructing window , because there's no html template for windows .`);
                     console.hint(`[DESKTOPjs] use '.set.window.html' function in desktop object to solve this problem .`);
@@ -91,8 +94,8 @@ export class desktop{
                         minimise_button,visible , 
                         resize_in_horizontal ,
                         resize_in_vertical , maximized ,
-                        this.#desktop_html ,
-                        this.#env.templates.window.html 
+                        this.#private.desktop_html ,
+                        this.#private.env.templates.window.html 
                     );
                     
                     // then return it reference
@@ -150,7 +153,7 @@ export class desktop{
                         return false;
                     }
                     // set new template to ENV
-                    this.#env.templates.window.html = parsed_html;
+                    this.#private.env.templates.window.html = parsed_html;
                     return true;
 
                 },
@@ -165,7 +168,7 @@ export class desktop{
             // get window HTML template 
             window : {
                 html : () => {
-                    return this.#env.templates.window.html;
+                    return this.#private.env.templates.window.html;
                 }
             },
 
