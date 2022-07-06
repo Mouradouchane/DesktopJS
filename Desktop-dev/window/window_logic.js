@@ -1,10 +1,10 @@
 
-export class window{
+export class window_logic{
     
     // === static properties for class it's self ===
     // windows index's for dealing with window : drag drop foucs blur ... 
-    static index = 0;
-    static max_index = 0;
+    static #index = 0;
+    static #max_index = 0;
 
     // === private properties ===
     #private = {
@@ -29,7 +29,7 @@ export class window{
         resize_h: null ,
         resize_v: null ,
         focus: true,
-        index: window.index += 1,
+        index: window_logic.#index += 1,
         parent_html: null,
     }
 
@@ -118,6 +118,7 @@ export class window{
 
         // check if some mandatory or required element missing =====================
         if( !(this.dom.container) || !(this.dom.top_bar) ){
+            
             console.error(`[DESKTOPjs] error in window ${this.#private.id} , because missing mandatory element "container" .`);
             console.info(`[DESKTOPjs] in window html template you need to make html element with class "container" .`);
             
@@ -192,7 +193,7 @@ export class window{
         this.dom.window.style.cssText +=  `height  : ${this.#private.height}px`;
         this.dom.window.style.cssText +=  `visibility  : ${ (this.#private.visible) ? "visible" : "hidden" }`;
         this.dom.window.style.zIndex = this.#private.index;
-        window.max_index += 1;
+        window_logic.#max_index += 1;
         
         // window title
         this.dom.title.textContent = this.#private.title;
@@ -219,9 +220,9 @@ export class window{
             }
 
             // check index & update it to max_index if needed
-            if(this.#private.index < window.max_index){
-                window.max_index += 1;
-                this.dom.window.style.zIndex = window.max_index;
+            if(this.#private.index < window_logic.#max_index){
+                window_logic.#max_index += 1;
+                this.dom.window.style.zIndex = window_logic.#max_index;
             }
 
             // get mouse x & y
@@ -294,9 +295,9 @@ export class window{
 
             // this window in drag event need to be in the top of all other windows 
             // set index to the max_index + 1 
-            if(this.#private.index < window.max_index){
-                window.max_index += 1;
-                this.dom.window.style.zIndex = window.max_index;
+            if(this.#private.index < window_logic.#max_index){
+                window_logic.#max_index += 1;
+                this.dom.window.style.zIndex = window_logic.#max_index;
             } 
  
             // this.#private.focus = true;
@@ -381,7 +382,7 @@ export class window{
             foucs : () => {
                 //debugger
 
-                this.#private.focus = ( this.get.z_index() >= window.max_index );
+                this.#private.focus = ( this.get.z_index() >= window_logic.#max_index );
                 return this.#private.focus;       
             },
             
@@ -621,8 +622,8 @@ export class window{
             // set this window top index
             top_index : () => {
 
-                window.max_index += 1;
-                this.dom.window.style.zIndex = window.max_index;
+                window_logic.#max_index += 1;
+                this.dom.window.style.zIndex = window_logic.#max_index;
 
             },
 

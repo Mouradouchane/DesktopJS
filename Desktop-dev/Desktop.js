@@ -1,4 +1,5 @@
-import {window} from "./window.js";
+import {window_logic} from "./window/window_logic.js";
+import {window} from "./window/window.js";
 
 
 export class desktop{
@@ -78,7 +79,7 @@ export class desktop{
                 if(!this.#private.env.templates.window.html){
                     
                     console.error(`[DESKTOPjs] error while constructing window , because there's no html template for windows .`);
-                    console.hint(`[DESKTOPjs] use '.set.window.html' function in desktop object to solve this problem .`);
+                    console.warn(`[DESKTOPjs] use '.set.window.html' function in desktop object to solve this problem .`);
                     
                     return null;
                 }
@@ -88,7 +89,7 @@ export class desktop{
                 if( typeof(id) === "string" && !this.running.windows[id] ){
 
                     // define new window 
-                    this.running.windows[id] = new window(
+                    this.running.windows[id] = new window_logic(
                         id , title , x , y , height , width ,
                         maximise_button ,
                         minimise_button,visible , 
