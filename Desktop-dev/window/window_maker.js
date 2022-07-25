@@ -10,6 +10,7 @@ export class window_maker{
             icon : document.createElement("img"),
             title : document.createElement("p"),
             top_bar : document.createElement("div"),
+            buttons : document.createElement("div"),
             hide_button : document.createElement("div"),
             maximize_button : document.createElement("div"),
             close_button : document.createElement("div"),
@@ -30,6 +31,7 @@ export class window_maker{
             title : null,
             icon : null,
             top_bar : null,
+            buttons : null,
             hide_button : null,
             maximize_button : null,
             close_button : null,
@@ -121,33 +123,45 @@ export class window_maker{
             this.#private.dom.top_bar.appendChild(
                 this.#private.dom.title
             ); 
+            
+            // setup buttons "close maximize close" 
+            this.#private.dom.buttons.classList.add("buttons");
 
             // setup hide button
             if(this.#private.dom.hide_button){
                 this.#private.dom.hide_button.classList.add("tb_button");
+                this.#private.dom.hide_button.classList.add("hide");
 
                 // append hide button to top_bar
-                this.#private.dom.top_bar.appendChild(
+                this.#private.dom.buttons.appendChild(
                     this.#private.dom.hide_button
                 );
             }
 
-            // setup 3 buttons "close maximize close" 
             if(this.#private.dom.maximize_button){
                 this.#private.dom.maximize_button.classList.add("tb_button");
+                this.#private.dom.maximize_button.classList.add("maximize");
 
-                this.#private.dom.top_bar.appendChild(
+                this.#private.dom.buttons.appendChild(
                     this.#private.dom.maximize_button
                 );
             }
+            
             if(this.#private.dom.close_button){
                 this.#private.dom.close_button.classList.add("tb_button");
+                this.#private.dom.close_button.classList.add("close");
 
-                this.#private.dom.top_bar.appendChild(
+                this.#private.dom.buttons.appendChild(
                     this.#private.dom.close_button
                 );
             }
             
+             
+            // append buttons to top_bar 
+            this.#private.dom.top_bar.appendChild(
+                this.#private.dom.buttons
+            );
+
             // append top_bar to window
             this.#private.dom.window.appendChild(
                 this.#private.dom.top_bar
