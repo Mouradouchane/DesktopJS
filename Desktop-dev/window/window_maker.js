@@ -4,6 +4,12 @@ export class window_maker{
     // private scope as "object" 
     #private = {
 
+        vars : {
+            parent_html : undefined,
+
+        },
+
+
         // window html elements object
         dom : {
             window : document.createElement("div"),
@@ -41,34 +47,6 @@ export class window_maker{
         }
     }
 
-    static #html_string =  `
-        <div class="window" >
-            <div class="top_bar" >
-                <img class="icon" src="./graphics/folder_open.png">
-                <p class="title"> test window </p>
-
-                <div class="tb_button minimize" id="minimize"></div>
-                <div class="tb_button maximize" id="maximize"></div>
-                <div class="tb_button close"    id="close"></div>
-                
-            </div>
-        
-            <div class="container"> </div>
-
-            <div class="resize resize_horizontal" id="resize_top"> </div>
-            <div class="resize resize_horizontal" id="resize_down"> </div>
-
-            <div class="resize resize_vertical" id="resize_left"> </div>
-            <div class="resize resize_vertical" id="resize_right"> </div>
-
-            <div class="resize resize_corner" id="resize_tl"> </div>
-            <div class="resize resize_corner" id="resize_tr"> </div>
-            <div class="resize resize_corner" id="resize_bl"> </div>
-            <div class="resize resize_corner" id="resize_br"> </div>
-
-        </div>
-    `;
-
     // function convert STRING TEMPLATE to HTML OBJECT
     static #template_to_HTML( window_html_as_string = "" ) {
         
@@ -89,24 +67,27 @@ export class window_maker{
 
     }
 
-    // function who compose window elements
+    // private function who make/compose window elements
     #build( ) {
         // debugger
         
-        if( this.#private.parent_html ){
+        if( this.#private.vars.parent_html ){
 
             // setup window 
             this.#private.dom.window.classList.add("window");
-            this.#private.dom.window.setAttribute("id" , this.#private.id );
+            this.#private.dom.window.setAttribute("id" , this.#private.vars.id );
             
             // setup mandatory elements attrs
             this.#private.dom.top_bar.classList.add("top_bar");
+            // add drag cursor effect to top_bar
+            this.#private.dom.top_bar.style.cursor = "move"; 
+
             this.#private.dom.container.classList.add("container");
 
             // setup icon if needed
-            if(this.#private.dom.icon){
+            if(this.#private.vars.icon){
 
-                this.#private.dom.icon.src = this.#private.icon_src;
+                this.#private.dom.icon.src = this.#private.vars.icon_src;
                 this.#private.dom.icon.classList.add("icon");
 
                 // append icon to top_bar
@@ -129,6 +110,7 @@ export class window_maker{
 
             // setup hide button
             if(this.#private.dom.hide_button){
+
                 this.#private.dom.hide_button.classList.add("tb_button");
                 this.#private.dom.hide_button.classList.add("hide");
 
@@ -136,24 +118,29 @@ export class window_maker{
                 this.#private.dom.buttons.appendChild(
                     this.#private.dom.hide_button
                 );
+
             }
 
             if(this.#private.dom.maximize_button){
+
                 this.#private.dom.maximize_button.classList.add("tb_button");
                 this.#private.dom.maximize_button.classList.add("maximize");
 
                 this.#private.dom.buttons.appendChild(
                     this.#private.dom.maximize_button
                 );
+
             }
             
             if(this.#private.dom.close_button){
+
                 this.#private.dom.close_button.classList.add("tb_button");
                 this.#private.dom.close_button.classList.add("close");
 
                 this.#private.dom.buttons.appendChild(
                     this.#private.dom.close_button
                 );
+
             }
             
              
@@ -171,67 +158,81 @@ export class window_maker{
             this.#private.dom.window.appendChild(
                 this.#private.dom.container
             );
-            
+
             // setup resize in height 
-            if( this.#private.resize_h ){
+            this.#private.dom.resize_t.classList.add("resize_vertical","resize_top","resize");
+            this.#private.dom.resize_b.classList.add("resize_vertical","resize_down","resize");
 
-                this.#private.dom.resize_t.classList.add("resize_h");
-                this.#private.dom.resize_b.classList.add("resize_h");
+            this.#private.dom.window.appendChild(
+                this.#private.dom.resize_t
+            );
 
-                this.#private.dom.window.appendChild(
-                    this.#private.dom.resize_t
-                );
-    
-                this.#private.dom.window.appendChild(
-                    this.#private.dom.resize_b
-                );
+            this.#private.dom.window.appendChild(
+                this.#private.dom.resize_b
+            );
+
+            
+            // setup resize
+            this.#private.dom.resize_l.classList.add("resize","resize_horizontal","resize_left");
+            this.#private.dom.resize_r.classList.add("resize","resize_horizontal","resize_right");
+                   
+            this.#private.dom.window.appendChild(
+                this.#private.dom.resize_l
+            );
+
+            this.#private.dom.window.appendChild(
+                this.#private.dom.resize_r
+            );
+            
+            if( !(this.#private.vars.resize_h) ){
+                this.#private.dom.resize_t.style.cursor = "default";
+                this.#private.dom.resize_b.style.cursor = "default";
             }
 
-            // setup resize in width 
-            if( this.#private.resize_v ){
-                this.#private.dom.resize_l.classList.add("resize_v");
-                this.#private.dom.resize_r.classList.add("resize_v");
-                       
-                this.#private.dom.window.appendChild(
-                    this.#private.dom.resize_l
-                );
-
-                this.#private.dom.window.appendChild(
-                    this.#private.dom.resize_r
-                );
+            if( !(this.#private.vars.resize_v) ){
+                this.#private.dom.resize_l.style.cursor = "default";
+                this.#private.dom.resize_r.style.cursor = "default";
             }
 
             // setup h & w resize elements
-            if( this.#private.resize_h ||this.#private.resize_v ){
+            
+            this.#private.dom.resize_tl.classList.add("resize","resize_corner","resize_tl");
+            this.#private.dom.resize_tr.classList.add("resize","resize_corner","resize_tr");
+            this.#private.dom.resize_bl.classList.add("resize","resize_corner","resize_bl");
+            this.#private.dom.resize_br.classList.add("resize","resize_corner","resize_br");
 
-                this.#private.dom.resize_tl.classList.add("resize_hw");
-                this.#private.dom.resize_tr.classList.add("resize_hw");
-                this.#private.dom.resize_bl.classList.add("resize_hw");
-                this.#private.dom.resize_br.classList.add("resize_hw");
+            this.#private.dom.window.appendChild(
+                this.#private.dom.resize_tl
+            );
 
-                this.#private.dom.window.appendChild(
-                    this.#private.dom.resize_tl
-                );
+            this.#private.dom.window.appendChild(
+                this.#private.dom.resize_bl
+            );
 
-                this.#private.dom.window.appendChild(
-                    this.#private.dom.resize_bl
-                );
+            this.#private.dom.window.appendChild(
+                this.#private.dom.resize_tr
+            );
+            
+            this.#private.dom.window.appendChild(
+                this.#private.dom.resize_br
+            );
 
-                this.#private.dom.window.appendChild(
-                    this.#private.dom.resize_tr
-                );
-
-                this.#private.dom.window.appendChild(
-                    this.#private.dom.resize_br
-                );
+            if( !(this.#private.vars.resize_h) || !(this.#private.vars.resize_v) ){
+                this.#private.dom.resize_tl.style.cursor = "default";
+                this.#private.dom.resize_tr.style.cursor = "default";
+                this.#private.dom.resize_bl.style.cursor = "default";
+                this.#private.dom.resize_br.style.cursor = "default";
             }
 
-            this.#private.parent_html.appendChild( this.#private.dom.window );
+            this.#private.vars.parent_html.appendChild( this.#private.dom.window );
      
             return true;
         }
         else return false;
     }
+
+
+
 
     constructor(
         id = "def" , title = "window" , x = 10, y = 10 , height = 512, width = 512 , 
@@ -241,57 +242,38 @@ export class window_maker{
     ){
 
         // check & set new values
-        this.#private.id        = (typeof(id)    == "string") ? id : "";
-        this.#private.title     = (typeof(title) == "string") ? title : "";
+        this.#private.vars.id        = (typeof(id)    == "string") ? id : "";
+        this.#private.vars.title     = (typeof(title) == "string") ? title : "";
 
-        this.#private.x         = (typeof(x) == "number") ? x : 0; 
-        this.#private.y         = (typeof(y) == "number") ? y : 0;
+        this.#private.vars.x         = (typeof(x) == "number") ? x : 0; 
+        this.#private.vars.y         = (typeof(y) == "number") ? y : 0;
 
-        this.#private.height    = (typeof(height) == "number") ? height : 0;
-        this.#private.width     = (typeof(width) == "number") ? width : 0;
+        this.#private.vars.height    = (typeof(height) == "number") ? height : 0;
+        this.#private.vars.width     = (typeof(width) == "number") ? width : 0;
 
-        this.#private.visible   = visible ? true : false;
-        this.#private.icon      = icon ? true : false;
-        this.#private.icon_src  = (typeof(icon_src) == "string") ? icon_src : "";
+        this.#private.vars.visible   = visible ? true : false;
+        this.#private.vars.icon      = icon ? true : false;
+        this.#private.vars.icon_src  = (typeof(icon_src) == "string") ? icon_src : "";
 
-        this.#private.hide_button      = hide_button ? true : false;
-        this.#private.maximize_button  = maximize_button ? true : false;
-        this.#private.close_button     = close_button ? true : false;
+        this.#private.vars.hide_button      = hide_button ? true : false;
+        this.#private.vars.maximize_button  = maximize_button ? true : false;
+        this.#private.vars.close_button     = close_button ? true : false;
 
-        this.#private.resize_h  = resize_in_horizontal ? true : false;
-        this.#private.resize_v  = resize_in_vertical ? true : false;
-        this.#private.maxi_or_mini = (maximized) ? true : false;
+        this.#private.vars.resize_h  = resize_in_horizontal ? true : false;
+        this.#private.vars.resize_v  = resize_in_vertical ? true : false;
+        this.#private.vars.maxi_or_mini = (maximized) ? true : false;
 
-        this.#private.parent_html = (where_to_append) ? where_to_append : document.body;
+        this.#private.vars.parent_html = (where_to_append) ? where_to_append : document.body;
 
         // filter no needed elements from this window
 
         // window 3 buttons close hide maximize
-        if( !(this.#private.maximize_button) ) this.#private.dom.maximize_button = undefined;
-        if( !(this.#private.close_button) ) this.#private.dom.close_button = undefined;
-        if( !(this.#private.hide_button) ) this.#private.dom.hide_button = undefined;
+        if( !(this.#private.vars.maximize_button) ) this.#private.dom.maximize_button = undefined;
+        if( !(this.#private.vars.close_button) ) this.#private.dom.close_button = undefined;
+        if( !(this.#private.vars.hide_button) ) this.#private.dom.hide_button = undefined;
         
-        // resize hidden element
-        if( !(this.#private.resize_h) ){
-            this.#private.dom.resize_t = undefined;
-            this.#private.dom.resize_b = undefined;
-        } 
 
-        if( !(this.#private.resize_v) ){
-            this.#private.dom.resize_l = undefined;
-            this.#private.dom.resize_r = undefined;
-        } 
-
-        if( !(this.#private.resize_v) || !(this.#private.resize_h) ){
-            
-            this.#private.dom.resize_tl = undefined;
-            this.#private.dom.resize_tr = undefined;
-            this.#private.dom.resize_bl = undefined;
-            this.#private.dom.resize_br = undefined;
-            
-        }
-
-        this.#build( this.#private.parent_html );
+        this.#build( this.#private.vars.parent_html );
     }
 
     get = {

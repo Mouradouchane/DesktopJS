@@ -7,7 +7,10 @@ export class desktop{
     
     // === private properties ===
     #private ={
+
         desktop_html : null,
+
+        background : null,
 
         // ENV object like sitting , where variables like "icons size" and more ...
         env : {
@@ -32,7 +35,7 @@ export class desktop{
 
     
     // desktop_html_id : html element id "where this desktop should be"
-    constructor( desktop_html_id = null ){
+    constructor( desktop_html_id = null , desktop_background = null){
         // debugger
 
         // id must be string
@@ -40,6 +43,18 @@ export class desktop{
             
             // try to select target html element
             this.#private.desktop_html = document.querySelector(`#${desktop_html_id}`);
+
+            // setup desktop background
+            if(desktop_background){
+                this.#private.background = desktop_background;
+
+                this.#private.desktop_html.style.cssText += `
+                    background-image: url("${ this.#private.background}");
+                    background-size : auto;
+                    background-repeat: no-repeat;
+                    background-position: center center; 
+                `;
+            }
             
             // check if selection is "null"
             if( !(this.#private.desktop_html) ){
@@ -55,6 +70,8 @@ export class desktop{
             }
 
         }
+
+
 
         // object where we store all running desktop elements window,folder,...
         // storing by "element id"

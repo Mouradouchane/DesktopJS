@@ -1,5 +1,6 @@
+import { window_maker } from "./window_maker.js";
 
-export class window_logic{
+export class window_logic extends window_maker {
     
     // === static properties for class it's self ===
     // windows index's for dealing with window : drag drop foucs blur ... 
@@ -8,29 +9,34 @@ export class window_logic{
 
     // === private properties ===
     #private = {
-        id: null ,
 
-        x: null ,
-        y: null ,
-        old_x: null ,
-        old_y: null ,
+        vars : {
+            id: null ,
 
-        height: null ,
-        width: null ,
-        old_width: null ,
-        old_height: null ,
+            x: null ,
+            y: null ,
+            old_x: null ,
+            old_y: null ,
 
-        visible: null ,
-        hide: null ,
-        maximize: null ,
-        maxi_or_mini: null ,
+            height: null ,
+            width: null ,
+            old_width: null ,
+            old_height: null ,
 
-        title: null ,
-        resize_h: null ,
-        resize_v: null ,
-        focus: true,
-        index: window_logic.#index += 1,
-        parent_html: null,
+            visible: null ,
+            hide: null ,
+            maximize: null ,
+            maxi_or_mini: null ,
+
+            title: null ,
+            resize_h: null ,
+            resize_v: null ,
+            focus: true,
+            index: window_logic.#index += 1,
+            parent_html: null,
+        },
+
+
     }
 
     // env object for window sitting's "private"
