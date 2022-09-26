@@ -1,6 +1,5 @@
-import {window_logic} from "./window/window_logic.js";
-import {window} from "./window/window.js";
 
+import { window } from "./window/window.js";
 
 export class desktop{
 
@@ -92,35 +91,27 @@ export class desktop{
             ) => {
                 //debugger
 
-                // if window html template not defined yet
-                if(!this.#private.env.templates.window.html){
-                    
-                    console.error(`[DESKTOPjs] error while constructing window , because there's no html template for windows .`);
-                    console.warn(`[DESKTOPjs] use '.set.window.html' function in desktop object to solve this problem .`);
-                    
-                    return null;
-                }
-
                 // make new window only if id "string" & id is "not reserved"
                 //if(this.running[id] == undefined || this.running[id] == null){
                 if( typeof(id) === "string" && !this.running.windows[id] ){
 
                     // define new window 
-                    this.running.windows[id] = new window_logic(
+                    this.running.windows[id] = new window(
                         id , title , x , y , height , width ,
                         maximise_button ,
                         minimise_button,visible , 
                         resize_in_horizontal ,
                         resize_in_vertical , maximized ,
                         this.#private.desktop_html ,
-                        this.#private.env.templates.window.html 
+                        // this.#private.env.templates.window.html 
                     );
                     
-                    // then return it reference
+                    // then the reference of the new created window
                     return this.running.windows[id];
 
                 }
                 else{ 
+
                     // else mean id is already reserved or invalid , soo no duplicate of id's
                     if(typeof(id) != "string"){
                         console.error(`[DESKTOPjs] window "id" must be string .`);
@@ -131,7 +122,9 @@ export class desktop{
 
                     return null;
                 }
+
             },
+
 
         },
 
