@@ -193,6 +193,15 @@ export class window{
                 call_back_args : [],
             },
 
+            close : {
+                call_back_function : null,
+                call_back_args : [],
+            },
+
+            open : {
+                call_back_function : null,
+                call_back_args : [],
+            },
         },
 
         
@@ -202,10 +211,21 @@ export class window{
             
             if( this.#private.vars.parent_html ){
 
-                // setup window 
+            // setup window
                 this.#private.dom.window.classList.add("window");
                 this.#private.dom.window.setAttribute("id" , this.#private.vars.id );
                 
+            // window attributes and properties 
+                this.#private.dom.window.setAttribute("id" , this.#private.vars.id);
+                this.#private.dom.window.style.cssText +=  `left : ${this.#private.vars.x}px`;
+                this.#private.dom.window.style.cssText +=  `top  : ${this.#private.vars.y}px`;
+                this.#private.dom.window.style.cssText +=  `width  : ${this.#private.vars.width}px`;
+                this.#private.dom.window.style.cssText +=  `height  : ${this.#private.vars.height}px`;
+                this.#private.dom.window.style.cssText +=  `visibility  : ${ (this.#private.vars.visible) ? "visible" : "hidden" }`;
+                this.#private.dom.window.style.zIndex = this.#private.vars.index;
+                window.#max_index += 1;
+
+
                 // setup mandatory elements attrs
                 this.#private.dom.top_bar.classList.add("top_bar");
                 // add drag cursor effect to top_bar
@@ -226,8 +246,8 @@ export class window{
 
                 }
 
-                // setup title
-                this.#private.dom.title.textContent = this.#private.title;
+                // setup title                            
+                this.#private.dom.title.textContent = this.#private.vars.title;
                 this.#private.dom.title.classList.add("title");
                 // append title to title_bar
                 this.#private.dom.top_bar.appendChild(
@@ -361,147 +381,34 @@ export class window{
         },
 
         // function who gonna setup logic/functionality at the window
-        build_functionality : ( where_to_append , html_template ) => {
-
-            // clone new window using as html element
-            this.dom.window = html_template.cloneNode(true); // mandatory
-            
-            // trying locate all window HTML Elements ===============================
-            this.dom.container = this.dom.window.querySelectorAll(".container")[0]; // mandatory 
-            this.dom.top_bar = this.dom.window.querySelectorAll(".top_bar")[0];  // mandatory 
-            
-            // top_bar elements
-            if( this.dom.top_bar ){
-                this.dom.title = this.dom.top_bar.querySelectorAll(".title")[0];
-                this.dom.icon = this.dom.top_bar.querySelectorAll(".icon")[0];
-                this.dom.minimize = this.dom.top_bar.querySelectorAll(".minimize")[0];
-                this.dom.maximize = this.dom.top_bar.querySelectorAll(".maximize")[0];
-                this.dom.close = this.dom.top_bar.querySelectorAll(".close")[0];
-            }
-
-            // required if resize_h is activated
-            this.dom.resize_t = this.dom.window.querySelectorAll(".resize_vertical")[0];  
-            this.dom.resize_b = this.dom.window.querySelectorAll(".resize_vertical")[1];  
-            
-            // required if resize_h is activated
-            this.dom.resize_l = this.dom.window.querySelectorAll(".resize_horizontal")[0];
-            this.dom.resize_r = this.dom.window.querySelectorAll(".resize_horizontal")[1];
-
-            // required if both resize_h and resize_h is activated
-            this.dom.resize_tl = this.dom.window.querySelectorAll(".resize_corner")[0];
-            this.dom.resize_tr = this.dom.window.querySelectorAll(".resize_corner")[1];
-            this.dom.resize_dl = this.dom.window.querySelectorAll(".resize_corner")[2];
-            this.dom.resize_dr = this.dom.window.querySelectorAll(".resize_corner")[3];
-            // end of "locate" =========================================================
-            
-
-            // check if some mandatory or required element missing =====================
-            if( !(this.dom.container) || !(this.dom.top_bar) ){
-                
-                console.error(`[DESKTOPjs] error in window ${this.#private.id} , because missing mandatory element "container" .`);
-                console.info(`[DESKTOPjs] in window html template you need to make html element with class "container" .`);
-                
-                return;
-            }
-
-            if( !(this.dom.resize_t) || !(this.dom.resize_b) ){
-                if( this.#private.resize_v ){
-                    console.error(`[DESKTOPjs] error in window ${this.#private.id} , because "resize_v" option is activated , but there's no html elements for it .`);
-                    console.info(`[DESKTOPjs] modifiy your window html template and put two html element with class "resize_vertical" .`)
-                }
-                if( this.#private.resize_h ){
-                    console.error(`[DESKTOPjs] error in window ${this.#private.id} , because "resize_h" option is activated , but there's no html elements for it `);
-                    console.info(`[DESKTOPjs] modifiy your window html template and put two html element with class "resize_horizontal" .`)
-                } 
-                return;
-            }
-    
-            // end of "checks" =========================================================
-
-                    
-            // filter no needed elements ===============================================
-
-            // if no needed to minimize button
-            if( !(this.#private.hide) ){
-                this.dom.minimize.parentNode.removeChild(this.dom.minimize);
-                this.dom.minimize = null;
-            }
-            // if no needed to maximize button
-            if( !(this.#private.maximize) ){
-                this.dom.maximize.parentNode.removeChild(this.dom.maximize);
-                this.dom.maximize = null;
-            }
-            // if no needed to resize_h
-            if( !(this.#private.resize_h) ){
-                this.dom.resize_l.parentNode.removeChild(this.dom.resize_l);
-                this.dom.resize_r.parentNode.removeChild(this.dom.resize_r);
-
-                this.dom.resize_l = null;
-                this.dom.resize_r = null;
-            }
-            // if no needed to resize_v
-            if( !(this.#private.resize_v) ){
-                this.dom.resize_t.parentNode.removeChild(this.dom.resize_t);
-                this.dom.resize_b.parentNode.removeChild(this.dom.resize_b);
-                
-                this.dom.resize_t = null;
-                this.dom.resize_b = null;
-            }
-            // if no needed to resize in corners
-            if( !this.#private.resize_h || !this.#private.resize_v ){
-                this.dom.resize_tl.parentNode.removeChild(this.dom.resize_tl);
-                this.dom.resize_tr.parentNode.removeChild(this.dom.resize_tr);
-                this.dom.resize_dl.parentNode.removeChild(this.dom.resize_dl);
-                this.dom.resize_dr.parentNode.removeChild(this.dom.resize_dr);
-
-                this.dom.resize_tl = null;
-                this.dom.resize_tr = null;
-                this.dom.resize_dl = null;
-                this.dom.resize_dr = null;
-            }
-            // end of "filter elements "================================================
-            
-
-            // setup window elements ===================================================
-            
-            // window attributes and properties 
-            this.dom.window.setAttribute("id" , this.#private.id);
-            this.dom.window.style.cssText +=  `left : ${this.#private.x}px`;
-            this.dom.window.style.cssText +=  `top  : ${this.#private.y}px`;
-            this.dom.window.style.cssText +=  `width  : ${this.#private.width}px`;
-            this.dom.window.style.cssText +=  `height  : ${this.#private.height}px`;
-            this.dom.window.style.cssText +=  `visibility  : ${ (this.#private.visible) ? "visible" : "hidden" }`;
-            this.dom.window.style.zIndex = this.#private.index;
-            window_logic.#max_index += 1;
-            
-            // window title
-            this.dom.title.textContent = this.#private.title;
+        build_functionality : ( ) => {
+     
 
             // setup window functionalities & events =====================================
 
             // setup drag/drag_start/drag_end events
 
-            this.dom.top_bar.addEventListener("mousedown" , (e) => {
+            this.#private.dom.top_bar.addEventListener("mousedown" , (e) => {
                 e.preventDefault();
                 
                 // debugger
 
                 // activate drag boolean & miniminze
-                this.env.drag.is_window_in_drag = true;
+                this.#private.env.drag.is_window_in_drag = true;
 
                 // this window in drag event need to be in the top of all other windows 
                 // set index to the max_index + 1 
                         
                 // run only if call_back_function valid function and window not in foucs
-                if( typeof(this.env.foucs.call_back_function) == "function" && this.is.foucs() == false ){
+                if( typeof(this.#private.env.foucs.call_back_function) == "function" && this.is.foucs() == false ){
                     // call event function
-                    this.env.foucs.call_back_function( this , e , ...(this.env.foucs.call_back_args) );
+                    this.#private.env.foucs.call_back_function( this , e , ...(this.#private.env.foucs.call_back_args) );
                 }
 
                 // check index & update it to max_index if needed
-                if(this.#private.index < window_logic.#max_index){
-                    window_logic.#max_index += 1;
-                    this.dom.window.style.zIndex = window_logic.#max_index;
+                if(this.#private.vars.index < window.#max_index){
+                    window.#max_index += 1;
+                    this.#private.dom.window.style.zIndex = window.#max_index;
                 }
 
                 // get mouse x & y
@@ -514,7 +421,7 @@ export class window{
                 document.onmousemove =  ( e ) => { // in middle of "drag" 
                     e.preventDefault();
 
-                    if( this.env.drag.is_window_in_drag ){ // if window in is really in drag
+                    if( this.#private.env.drag.is_window_in_drag ){ // if window in is really in drag
                     
                         // calculate the new mouse position
                         let new_mouse_x = mouse_x - e.clientX;
@@ -524,59 +431,59 @@ export class window{
                         mouse_y = e.clientY;
                         
                         // set new x and y to the window using setter function x and y in window.set
-                        this.set.x(this.dom.window.offsetLeft - new_mouse_x);
-                        this.set.y(this.dom.window.offsetTop  - new_mouse_y);
+                        this.set.x(this.#private.dom.window.offsetLeft - new_mouse_x);
+                        this.set.y(this.#private.dom.window.offsetTop  - new_mouse_y);
 
 
                         // if there's call_back_function for "drag" 
-                        if(this.env.drag.in.call_back_function){
+                        if(this.#private.env.drag.in.call_back_function){
                             // run it and pass (window , event , and some optional args)
-                            this.env.drag.in.call_back_function( this , e , ...(this.env.drag.in.call_back_args) )
+                            this.#private.env.drag.in.call_back_function( this , e , ...(this.#private.env.drag.in.call_back_args) )
                         } 
                     }
                 };
         
                 // if there's call_back_function for "drag_start" 
-                if(this.env.drag.start.call_back_function){
+                if(this.#private.env.drag.start.call_back_function){
                     // run it and pass (window , event , and some optional args , if available)
-                    this.env.drag.start.call_back_function(this , e , ...(this.env.drag.start.call_back_args) )
+                    this.#private.env.drag.start.call_back_function(this , e , ...(this.#private.env.drag.start.call_back_args) )
                 } 
 
             });
 
             // when "drag end"
-            this.dom.top_bar.addEventListener("mouseup", (e) => {
+            this.#private.dom.top_bar.addEventListener("mouseup", (e) => {
                 // debugger
                 // switch to drag off
-                this.env.drag.is_window_in_drag  = false;
+                this.#private.env.drag.is_window_in_drag  = false;
                 
                 // drop window
                 document.onmousemove = null;
 
                 // if there's call_back_function for "drag_end" 
-                if( this.env.drag.end.call_back_function ){
+                if( this.#private.env.drag.end.call_back_function ){
                     // run it and pass (window , event , and some optional args , if available)
-                    this.env.drag.end.call_back_function(this , e , ...(this.env.drag.end.call_back_args) )
+                    this.#private.env.drag.end.call_back_function(this , e , ...(this.#private.env.drag.end.call_back_args) )
                 } 
 
             });
 
             
             // setup foucs event
-            this.dom.window.addEventListener("click" , (e) => {
+            this.#private.dom.window.addEventListener("click" , (e) => {
                 //debugger
                 
                 // run only if call_back_function valid & window not in foucs
-                if( this.env.foucs.call_back_function && this.is.blur() ){
+                if( this.#private.env.foucs.call_back_function && this.is.blur() ){
                     // call event function
-                    this.env.foucs.call_back_function( this , e , ...(this.env.foucs.call_back_args) );
+                    this.#private.env.foucs.call_back_function( this , e , ...(this.#private.env.foucs.call_back_args) );
                 }
 
                 // this window in drag event need to be in the top of all other windows 
                 // set index to the max_index + 1 
-                if(this.#private.index < window_logic.#max_index){
-                    window_logic.#max_index += 1;
-                    this.dom.window.style.zIndex = window_logic.#max_index;
+                if(this.#private.vars.index < window.#max_index){
+                    window.#max_index += 1;
+                    this.#private.dom.window.style.zIndex = window.#max_index;
                 } 
     
                 // this.#private.focus = true;
@@ -595,25 +502,17 @@ export class window{
             }
 
             // "maximize minimize" click event on maximize button
-            if(this.#private.maximize && this.dom.maximize){
-                this.dom.maximize.addEventListener("click" , maxi_or_mini);
+            if(this.#private.vars.maximize && this.#private.dom.maximize_button){
+                this.#private.dom.maximize_button.addEventListener("click" , maxi_or_mini);
             }
 
             // "maximize minimize" double-click event on top_bar 
-            this.dom.top_bar.addEventListener("dblclick" , maxi_or_mini);
+            this.#private.dom.top_bar.addEventListener("dblclick" , maxi_or_mini);
 
 
             // end of "setup functionalities & events" ========================================
 
 
-
-            // append this new window to the current desktop
-            if(where_to_append){
-            
-                if(this.#private.maxi_or_mini) this.set.maximize();
-                where_to_append.append(this.dom.window);
-
-            } 
         }
 
 
@@ -624,12 +523,14 @@ export class window{
 
 
     constructor(  // needed parameter's to construct a window object
-        id = "def" , title = "window" , x = 10, y = 10 , height = 512, width = 512 , 
-        hide_button = true , maximize_button = true , close_button = true , icon = true , icon_src ,
-        visible = true , resize_in_horizontal = true , resize_in_vertical = true , maximized = false, 
-        where_to_append = null 
+        id = "def" , title = "window" , 
+        x = 10, y = 10 , 
+        height = 512, width = 512 , 
+        hide_button = true , maximize_button = true , close_button = true , 
+        icon = true , icon_src = "",
+        resize_in_horizontal = true , resize_in_vertical = true , where_to_append = null 
     ){
-
+        //debugger
 
         // check & set new values
         this.#private.vars.id        = (typeof(id)    == "string") ? id : "";
@@ -641,7 +542,7 @@ export class window{
         this.#private.vars.height    = (typeof(height) == "number") ? height : 0;
         this.#private.vars.width     = (typeof(width) == "number") ? width : 0;
 
-        this.#private.vars.visible   = visible ? true : false;
+        this.#private.vars.visible   = false;
         this.#private.vars.icon      = icon ? true : false;
         this.#private.vars.icon_src  = (typeof(icon_src) == "string") ? icon_src : "";
 
@@ -651,7 +552,7 @@ export class window{
 
         this.#private.vars.resize_h  = resize_in_horizontal ? true : false;
         this.#private.vars.resize_v  = resize_in_vertical ? true : false;
-        this.#private.vars.maxi_or_mini = (maximized) ? true : false;
+        this.#private.vars.maxi_or_mini = false;
 
         this.#private.vars.parent_html = (where_to_append) ? where_to_append : document.body;
 
@@ -665,7 +566,7 @@ export class window{
         
 
         // this function will start building window as html at this point
-        this.#private.build_html( this.#private.vars.parent_html );
+        this.#private.build_html( );
         
 
         
@@ -679,22 +580,22 @@ export class window{
             
             // for check if this window in drag right now or not  
             in_drag : () => {
-                return this.env.drag.is_window_in_drag;
+                return this.#private.env.drag.is_window_in_drag;
             },
 
             open : () => {
-                return this.#private.visible ;
+                return this.#private.vars.visible ;
             },
 
             close : () => {
-                return this.#private.visible ? false : true;
+                return this.#private.vars.visible ? false : true;
             },
 
             foucs : () => {
                 //debugger
 
-                this.#private.focus = ( this.get.z_index() >= window_logic.#max_index );
-                return this.#private.focus;       
+                this.#private.vars.focus = ( this.get.z_index() >= window.#max_index );
+                return this.#private.vars.focus;       
             },
             
             blur : () => {     
@@ -702,11 +603,11 @@ export class window{
             },
 
             maximize : () => {
-                return this.#private.maxi_or_mini;
+                return this.#private.vars.maxi_or_mini;
             },
 
             minimize : () => {
-                return !( this.#private.maxi_or_mini );
+                return !( this.#private.vars.maxi_or_mini );
             }
 
         }
@@ -721,8 +622,8 @@ export class window{
                 if(typeof(call_back_function) == "function"){
                                     
                     // save call_back_function and it's arguments
-                    this.env.drag.start.call_back_function = call_back_function;
-                    this.env.drag.start.call_back_args = args;
+                    this.#private.env.drag.start.call_back_function = call_back_function;
+                    this.#private.env.drag.start.call_back_args = args;
 
                 }
                 else{ // mean call_back_function is not function 
@@ -738,8 +639,8 @@ export class window{
                 if(typeof(call_back_function) == "function"){
                     
                     // save call_back_function and it's arguments
-                    this.env.drag.in.call_back_function = call_back_function;
-                    this.env.drag.in.call_back_args = args;
+                    this.#private.env.drag.in.call_back_function = call_back_function;
+                    this.#private.env.drag.in.call_back_args = args;
 
                 }
                 else{ // mean call_back_function is not function 
@@ -754,8 +655,8 @@ export class window{
                 if(typeof(call_back_function) == "function"){
                     
                     // save call_back_function and it's arguments
-                    this.env.drag.end.call_back_function = call_back_function;
-                    this.env.drag.end.call_back_args = args;
+                    this.#private.env.drag.end.call_back_function = call_back_function;
+                    this.#private.env.drag.end.call_back_args = args;
 
                 }
                 else{ // mean call_back_function is not function 
@@ -770,8 +671,8 @@ export class window{
                 if(typeof(call_back_function) == "function"){
                                     
                     // save call_back_function and it's arguments
-                    this.env.foucs.call_back_function = call_back_function;
-                    this.env.foucs.call_back_args = args;
+                    this.#private.env.foucs.call_back_function = call_back_function;
+                    this.#private.env.foucs.call_back_args = args;
 
                 }
                 else{ // mean call_back_function is not function 
@@ -779,6 +680,38 @@ export class window{
                 }
             },
 
+            
+            close : ( call_back_function = null , ...args ) => {
+
+                // call_back_function must be function
+                if(typeof(call_back_function) == "function"){
+                                                                    
+                    // save call_back_function and it's arguments
+                    this.#private.env.close.call_back_function = call_back_function;
+                    this.#private.env.close.call_back_args = args;
+
+                }
+                else{ // mean call_back_function is not function 
+                    console.error("[DESKTOPjs] parameter 'call_back_function' must be function");
+                }
+
+            },
+
+            open : ( call_back_function = null , ...args ) => {
+
+                // call_back_function must be function
+                if(typeof(call_back_function) == "function"){
+                                                                    
+                    // save call_back_function and it's arguments
+                    this.#private.env.open.call_back_function = call_back_function;
+                    this.#private.env.open.call_back_args = args;
+
+                }
+                else{ // mean call_back_function is not function 
+                    console.error("[DESKTOPjs] parameter 'call_back_function' must be function");
+                }
+
+            },
 
             // ============ need work ============
             maximize : ( call_back_function = null , ...args ) => {
@@ -787,8 +720,8 @@ export class window{
                 if(typeof(call_back_function) == "function"){
                                                     
                     // save call_back_function and it's arguments
-                    this.env.maximize.call_back_function = call_back_function;
-                    this.env.maximize.call_back_args = args;
+                    this.#private.env.maximize.call_back_function = call_back_function;
+                    this.#private.env.maximize.call_back_args = args;
 
                 }
                 else{ // mean call_back_function is not function 
@@ -797,6 +730,7 @@ export class window{
 
             },
 
+
             // ============ need work ============
             minimize : ( call_back_function = null , ...args ) => {
 
@@ -804,14 +738,16 @@ export class window{
                 if(typeof(call_back_function) == "function"){
                                                                     
                     // save call_back_function and it's arguments
-                    this.env.minimize.call_back_function = call_back_function;
-                    this.env.minimize.call_back_args = args;
+                    this.#private.env.minimize.call_back_function = call_back_function;
+                    this.#private.env.minimize.call_back_args = args;
 
                 }
                 else{ // mean call_back_function is not function 
                     console.error("[DESKTOPjs] parameter 'call_back_function' must be function");
                 }
             }
+
+            
         }
 
 
@@ -822,8 +758,8 @@ export class window{
             x : ( new_x = 0) => {
                 // check
                 if( typeof(new_x) == "number"){
-                    this.#private.x = new_x; // set new value if it valid
-                    this.dom.window.style.left = this.#private.x + "px";
+                    this.#private.vars.x = new_x; // set new value if it valid
+                    this.#private.dom.window.style.left = this.#private.vars.x + "px";
                     return true; // return confirmation :)
                 }
                 else { // mean invalid value
@@ -835,8 +771,8 @@ export class window{
             // like x() function
             y : ( new_y = 0 ) => {
                 if( typeof(new_y) == "number"){
-                    this.#private.y = new_y;
-                    this.dom.window.style.top = this.#private.y + "px";
+                    this.#private.vars.y = new_y;
+                    this.#private.dom.window.style.top = this.#private.vars.y + "px";
                     return true;
                 }
                 else {
@@ -850,9 +786,9 @@ export class window{
                 // check value
                 if( typeof(new_width) === "number"){
 
-                    this.#private.old_width = this.#private.width;
-                    this.#private.width = new_width; // set new value if it valid
-                    this.dom.window.style.width = this.#private.width + "px";
+                    this.#private.vars.old_width = this.#private.vars.width;
+                    this.#private.vars.width = new_width; // set new value if it valid
+                    this.#private.dom.window.style.width = this.#private.vars.width + "px";
                     
                     return true; // confirmation 
                 }
@@ -866,9 +802,9 @@ export class window{
                 // check value
                 if( typeof(new_height) === "number"){
 
-                    this.#private.old_height = this.#private.height;
-                    this.#private.height = new_height; // set new value if it valid
-                    this.dom.window.style.height = this.#private.height + "px";
+                    this.#private.vars.old_height = this.#private.vars.height;
+                    this.#private.vars.height = new_height; // set new value if it valid
+                    this.#private.dom.window.style.height = this.#private.vars.height + "px";
                     
                     return true; // confirmation 
                 }
@@ -886,8 +822,8 @@ export class window{
                     return false;
                 }
                 else {
-                    this.#private.title = new_title;
-                    this.dom.title.textContent = this.#private.title;
+                    this.#private.vars.title = new_title;
+                    this.#private.dom.title.textContent = this.#private.vars.title;
 
                     return true;
                 }
@@ -903,17 +839,17 @@ export class window{
                 }
                 else {
 
-                    for(let element in this.dom){
+                    for(let element in this.#private.dom){
 
                         if(replace){
                         
                             // remove old class
-                            this.dom[element].classList.remove(old_class_name);
-                            this.dom[element].classList.add(class_name);
+                            this.#private.dom[element].classList.remove(old_class_name);
+                            this.#private.dom[element].classList.add(class_name);
                             
                         }
                         else{
-                            this.dom[element].classList.add(class_name);
+                            this.#private.dom[element].classList.add(class_name);
                         }
                         
                     }
@@ -925,16 +861,16 @@ export class window{
             // set visiblity function used with open & close functions
             visibility : ( is_visible = true ) => {
                 
-                this.#private.visible = ( is_visible ? true : false );
-                this.dom.window.style.cssText +=  `visibility  : ${ (this.#private.visible) ? "visible" : "hidden"}`;
+                this.#private.vars.visible = ( is_visible ? true : false );
+                this.#private.dom.window.style.visibility =  (this.#private.vars.visible) ? "visible" : "hidden";
 
             },
 
             // set this window top index
             top_index : () => {
 
-                window_logic.#max_index += 1;
-                this.dom.window.style.zIndex = window_logic.#max_index;
+                window.#max_index += 1;
+                this.#private.dom.window.style.zIndex = window.#max_index;
 
             },
 
@@ -943,16 +879,16 @@ export class window{
                 // debugger
 
                 // get task_bar if there's task_bar in desktop
-                let task_bar = this.#private.parent_html.querySelector("#private.taskbar");
+                let task_bar = this.#private.vars.parent_html.querySelector("#private.taskbar");
                 
                 // save old "x y" and" width height" for minimize later 
-                this.#private.old_x = this.#private.x;
-                this.#private.old_y = this.#private.y;
+                this.#private.vars.old_x = this.#private.vars.x;
+                this.#private.vars.old_y = this.#private.vars.y;
 
-                this.#private.old_width  = this.#private.width;
-                this.#private.old_height = this.#private.height;
+                this.#private.vars.old_width  = this.#private.vars.width;
+                this.#private.vars.old_height = this.#private.vars.height;
                 
-                this.dom.window.style.cssText = `
+                this.#private.dom.window.style.cssText = `
                     top    : 0px;
                     left   : 0px;
                     width  : 100%;
@@ -960,14 +896,14 @@ export class window{
                 `;
 
                 // toggle to maximized
-                this.#private.maxi_or_mini = true;
+                this.#private.vars.maxi_or_mini = true;
                 // set top z-index to this window
                 this.set.top_index();
 
                 // if there's call_back_function for maximize event , run it
-                if( typeof(this.env.maximize.call_back_function) === "function" ){
+                if( typeof(this.#private.env.maximize.call_back_function) === "function" ){
 
-                    this.env.maximize.call_back_function( this , e , ...this.env.maximize.call_back_args );
+                    this.#private.env.maximize.call_back_function( this , e , ...this.#private.env.maximize.call_back_args );
 
                 } 
             },
@@ -975,10 +911,10 @@ export class window{
             minimize : ( e = null ) => {
                 debugger
 
-                this.#private.width  = this.#private.old_width;
-                this.#private.height = this.#private.old_height;
+                this.#private.vars.width  = this.#private.vars.old_width;
+                this.#private.vars.height = this.#private.vars.old_height;
                 
-                this.dom.window.style.cssText = `
+                this.#private.dom.window.style.cssText = `
                     top    : ${this.#private.y}px;
                     left   : ${this.#private.x}px;
                     width  : ${this.#private.width}px;
@@ -989,12 +925,12 @@ export class window{
                 this.set.top_index();
 
                 // toggle to minimize 
-                this.#private.maxi_or_mini = false;
+                this.#private.vars.maxi_or_mini = false;
                 
                 // if there's call_back_function for maximize event , run it
-                if( typeof(this.env.minimize.call_back_function) === "function" ){
+                if( typeof(this.#private.env.minimize.call_back_function) === "function" ){
 
-                    this.env.minimize.call_back_function( this , e , ...this.env.minimize.call_back_args );
+                    this.#private.env.minimize.call_back_function( this , e , ...this.#private.env.minimize.call_back_args );
 
                 } 
 
@@ -1005,7 +941,7 @@ export class window{
                 
                 // loop over all and set as public properties
                 for(let name in new_public_values){
-                    this[name] = new_public_values[name];
+                    this.public[name] = new_public_values[name];
                 }
 
             },
@@ -1015,39 +951,39 @@ export class window{
         // object provides all possible needed values public or private 
         this.get = { 
             x : () => {
-                return this.#private.x;
+                return this.#private.vars.x;
             },
 
             y : () => {
-                return this.#private.y;
+                return this.#private.vars.y;
             },
 
             id : () => {
-                return this.#private.id;
+                return this.#private.vars.id;
             },
 
             width : () => {
-                return this.#private.width;
+                return this.#private.vars.width;
             },
 
             height : () => {
-                return this.#private.height;
+                return this.#private.vars.height;
             },
 
             visibility : () => {
-                return this.#private.visible;
+                return this.#private.vars.visible;
             },
         
             title : () => {
-                return this.#private.title;
+                return this.#private.vars.title;
             },
 
             index : () => {
-                return this.#private.index;
+                return this.#private.vars.index;
             },
 
             z_index : () => {
-                return Number.parseInt(this.dom.window.style.zIndex);
+                return Number.parseInt(this.#private.dom.window.style.zIndex);
             },
 
             // function return object contain all private "values" 
@@ -1057,22 +993,29 @@ export class window{
             },
             
             resize_h : () => {
-                return this.#private.resize_h;
+                return this.#private.vars.resize_h;
             },
 
             resize_v : () => {
-                return this.#private.resize_v;
+                return this.#private.vars.resize_v;
             },
         }
 
 
-
         // when user want to open window
         this.open  = ( call_back_function = null , ...call_back_args ) =>{ 
-
+            // debugger
+            
             // make window visible 'open'
-            if(!this.#private.visible) this.set.visibility(true);
+            this.set.visibility(true);
 
+            
+            if( typeof(this.#private.env.open.call_back_function) === "function"){
+                this.#private.env.open.call_back_function(
+                    this , ...(this.#private.env.open.call_back_args)
+                )
+            }
+            
             // call_back_function must be function
             if( typeof(call_back_function) === "function" ) {
 
@@ -1089,12 +1032,19 @@ export class window{
 
         // when user want to close window
         this.close = ( call_back_function = null , ...call_back_args ) =>{
-
+        
             // make window visible 'open'
-            if(this.#private.visible) this.set.visibility(false);
+            this.set.visibility(false);
+
+            if( typeof(this.#private.env.close.call_back_function) === "function"){
+                this.#private.env.close.call_back_function(
+                    this , ...(this.#private.env.close.call_back_args)
+                )
+            }
 
             if( typeof(call_back_function) === "function" ) {
                 call_back_function(this , ...call_back_args);
+
             }  
             else {
                 if( call_back_function != null ) {
@@ -1105,10 +1055,9 @@ export class window{
         }
 
 
-
         // *** important process before the end ***
         // call build function for building this window
-        this.#private.build_functionality(where_to_append , html_template);
+        this.#private.build_functionality(  );
 
     }
 

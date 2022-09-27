@@ -85,9 +85,13 @@ export class desktop{
 
             // make new window
             window : (
-                id = "def" , title = "window" , x = 10, y = 10 , height = 512, width = 512 , 
-                maximise_button = true , minimise_button = true , visible = true , 
-                resize_in_horizontal = true , resize_in_vertical = true , maximized = false, 
+                id = "def" , title = "window" , 
+                x = 10, y = 10 , 
+                height = 512, width = 512 , 
+                hide_button = true , maximize_button = true , close_button = true , 
+                icon = true , icon_src ,
+                resize_in_horizontal = true , resize_in_vertical = true , where_to_append = null 
+    
             ) => {
                 //debugger
 
@@ -98,12 +102,13 @@ export class desktop{
                     // define new window 
                     this.running.windows[id] = new window(
                         id , title , x , y , height , width ,
-                        maximise_button ,
-                        minimise_button,visible , 
+                        hide_button,
+                        maximize_button ,
+                        close_button ,
+                        icon , icon_src,
                         resize_in_horizontal ,
-                        resize_in_vertical , maximized ,
-                        this.#private.desktop_html ,
-                        // this.#private.env.templates.window.html 
+                        resize_in_vertical ,
+                        (where_to_append) ? where_to_append : this.#private.desktop_html ,
                     );
                     
                     // then the reference of the new created window
