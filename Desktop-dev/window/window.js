@@ -86,30 +86,38 @@ export class window{
         // store all private variables here
         vars : {
             parent_html : undefined,
+            title: null ,
             id: null ,
 
-            x: null ,
-            y: null ,
-            old_x: null ,
-            old_y: null ,
+            x: 0 ,
+            y: 0 ,
+            old_x: 0 ,
+            old_y: 0 ,
 
-            height: null ,
-            width: null ,
-            old_width: null ,
-            old_height: null ,
+            height: 0 ,
+            width: 0 ,
+            old_width: 0 ,
+            old_height: 0 ,
 
             visible: null ,
-            hide: null ,
-            maximize: null ,
+
+            hide_allowed: null ,
+            maximize_allowed: true ,
+            close_allowed: true ,
+
+            maximize_button: true,
+            close_button:true,
+            hide_button:true,
+
             maxi_or_mini: null ,
 
-            title: null ,
             resize_h: null ,
             resize_v: null ,
+
             focus: true,
             index: window.#index += 1,
+            
             parent_html: null,
-        
         },
 
         // window html elements should be here
@@ -246,64 +254,87 @@ export class window{
 
                 }
 
-                // setup title                            
+            // setup title                            
                 this.#private.dom.title.textContent = this.#private.vars.title;
                 this.#private.dom.title.classList.add("title");
-                // append title to title_bar
+            // append title to title_bar
                 this.#private.dom.top_bar.appendChild(
                     this.#private.dom.title
                 ); 
+            
                 
-                // setup buttons "close maximize close" 
+        
+            /*
+                filter/setup buttons "close maximize close" 
+            */
+            
                 this.#private.dom.buttons.classList.add("buttons");
+            
+            // setup close button
+                if( !(this.#private.vars.close_button) ) {
+                this.#private.dom.close_button = undefined;     
+                this.#private.vars.close_allowed = undefined;     
+                }
+                else {
+                    // setup button
+                    this.#private.dom.close_button.classList.add("tb_button");
+                    this.#private.dom.close_button.classList.add("close");
 
-                // setup hide button
-                if(this.#private.dom.hide_button){
+                    // append close_button to top_bar
+                    this.#private.dom.buttons.appendChild(
+                        this.#private.dom.close_button
+                    );
+                }
+            
+            // setup maximize button
+                if( !(this.#private.vars.maximize_button) ){
+                    this.#private.dom.maximize_button = undefined;
+                    this.#private.vars.maximize_allowed = false;
+                } 
+                else{
+                    // setup button
+                    this.#private.vars.maximize_allowed = true;
+                    this.#private.dom.maximize_button.classList.add("tb_button");
+                    this.#private.dom.maximize_button.classList.add("maximize");
 
+                    // append maximize_button to top_bar
+                    this.#private.dom.buttons.appendChild(
+                        this.#private.dom.maximize_button
+                    );
+                }
+                        
+            // setup hide button
+                if( !(this.#private.vars.hide_button) ){
+                    this.#private.dom.hide_button = undefined;
+                    this.#private.vars.hide_allowed = false;
+                } 
+                else{
+                    // setup button
+                    this.#private.vars.hide_allowed = true;
                     this.#private.dom.hide_button.classList.add("tb_button");
                     this.#private.dom.hide_button.classList.add("hide");
 
-                    // append hide button to top_bar
+                    // append hide_button to top_bar
                     this.#private.dom.buttons.appendChild(
                         this.#private.dom.hide_button
                     );
 
                 }
 
-                if(this.#private.dom.maximize_button){
-
-                    this.#private.dom.maximize_button.classList.add("tb_button");
-                    this.#private.dom.maximize_button.classList.add("maximize");
-
-                    this.#private.dom.buttons.appendChild(
-                        this.#private.dom.maximize_button
-                    );
-
-                }
+ 
+          
                 
-                if(this.#private.dom.close_button){
-
-                    this.#private.dom.close_button.classList.add("tb_button");
-                    this.#private.dom.close_button.classList.add("close");
-
-                    this.#private.dom.buttons.appendChild(
-                        this.#private.dom.close_button
-                    );
-
-                }
-                
-                
-                // append buttons to top_bar 
+            // append buttons container to top_bar 
                 this.#private.dom.top_bar.appendChild(
                     this.#private.dom.buttons
                 );
 
-                // append top_bar to window
+            // append top_bar to window
                 this.#private.dom.window.appendChild(
                     this.#private.dom.top_bar
                 );
                 
-                // append container to window
+            // append container to window
                 this.#private.dom.window.appendChild(
                     this.#private.dom.container
                 );
@@ -386,8 +417,8 @@ export class window{
 
             // setup window functionalities & events =====================================
 
-            // setup drag/drag_start/drag_end events
-
+            
+            // when drag start
             this.#private.dom.top_bar.addEventListener("mousedown" , (e) => {
                 e.preventDefault();
                 
@@ -415,32 +446,36 @@ export class window{
                 let mouse_x = e.clientX;
                 let mouse_y = e.clientY;
 
-    
-                // set mousemove event to the document for keep tracking dragged window
-                // if drag boolean is activated
-                document.onmousemove =  ( e ) => { // in middle of "drag" 
+                
+                // when window in drag 
+                document.onmousemove =  ( e ) => { 
+                    // debugger
                     e.preventDefault();
-
+                    
                     if( this.#private.env.drag.is_window_in_drag ){ // if window in is really in drag
                     
                         // calculate the new mouse position
                         let new_mouse_x = mouse_x - e.clientX;
                         let new_mouse_y = mouse_y - e.clientY;
+                        
                         // save current mouse x y 
                         mouse_x = e.clientX;
                         mouse_y = e.clientY;
                         
                         // set new x and y to the window using setter function x and y in window.set
-                        this.set.x(this.#private.dom.window.offsetLeft - new_mouse_x);
-                        this.set.y(this.#private.dom.window.offsetTop  - new_mouse_y);
-
+                        this.set.width( this.#private.vars.old_width );
+                        this.set.height( this.#private.vars.old_height );
+                        this.set.x( mouse_x - (this.#private.vars.width/2));
+                        this.set.y( this.#private.vars.y - new_mouse_y );
 
                         // if there's call_back_function for "drag" 
                         if(this.#private.env.drag.in.call_back_function){
                             // run it and pass (window , event , and some optional args)
                             this.#private.env.drag.in.call_back_function( this , e , ...(this.#private.env.drag.in.call_back_args) )
-                        } 
+                        }
+
                     }
+
                 };
         
                 // if there's call_back_function for "drag_start" 
@@ -451,7 +486,7 @@ export class window{
 
             });
 
-            // when "drag end"
+            // when drag end
             this.#private.dom.top_bar.addEventListener("mouseup", (e) => {
                 // debugger
                 // switch to drag off
@@ -490,9 +525,10 @@ export class window{
             })
 
 
-            let maxi_or_mini = () => {
-                
-                if( this.#private.maxi_or_mini ){
+            let maximize_or_minimize = () => {
+                // debugger
+
+                if( this.#private.vars.maxi_or_mini ){
                     this.set.minimize();
                 }
                 else{
@@ -502,16 +538,18 @@ export class window{
             }
 
             // "maximize minimize" click event on maximize button
-            if(this.#private.vars.maximize && this.#private.dom.maximize_button){
-                this.#private.dom.maximize_button.addEventListener("click" , maxi_or_mini);
-            }
+            if(this.#private.vars.maximize_allowed && this.#private.dom.maximize_button){
 
-            // "maximize minimize" double-click event on top_bar 
-            this.#private.dom.top_bar.addEventListener("dblclick" , maxi_or_mini);
+                // set function to maximize button 
+                this.#private.dom.maximize_button.addEventListener("click" , maximize_or_minimize);
+                
+                // set function to top_bar
+                this.#private.dom.top_bar.addEventListener("dblclick" , maximize_or_minimize);
+
+            }
 
 
             // end of "setup functionalities & events" ========================================
-
 
         }
 
@@ -556,14 +594,6 @@ export class window{
 
         this.#private.vars.parent_html = (where_to_append) ? where_to_append : document.body;
 
-        
-        // filter no needed elements from this window
-
-        // window 3 buttons close/hide/maximize
-        if( !(this.#private.vars.maximize_button) ) this.#private.dom.maximize_button = undefined;
-        if( !(this.#private.vars.close_button) ) this.#private.dom.close_button = undefined;
-        if( !(this.#private.vars.hide_button) ) this.#private.dom.hide_button = undefined;
-        
 
         // this function will start building window as html at this point
         this.#private.build_html( );
@@ -755,22 +785,25 @@ export class window{
         this.set = {
 
             // set new x value only if "new_x" valid number
-            x : ( new_x = 0) => {
+            x : ( new_x = 0 ) => {
+
                 // check
-                if( typeof(new_x) == "number"){
+                if( typeof(new_x) == "number" ){
                     this.#private.vars.x = new_x; // set new value if it valid
                     this.#private.dom.window.style.left = this.#private.vars.x + "px";
-                    return true; // return confirmation :)
+                    return true; 
                 }
                 else { // mean invalid value
                     console.warn("[DESKTOPjs] new_x parameter must be number ")
-                    return false; // return confirmation :(
+                    return false; 
                 }
+
             },
 
             // like x() function
             y : ( new_y = 0 ) => {
-                if( typeof(new_y) == "number"){
+
+                if( typeof(new_y) == "number" ){
                     this.#private.vars.y = new_y;
                     this.#private.dom.window.style.top = this.#private.vars.y + "px";
                     return true;
@@ -779,45 +812,51 @@ export class window{
                     console.warn("[DESKTOPjs] new_y parameter must be number ");
                     return false;
                 }
+
             },
 
             // set new width 
-            width : ( new_width = 0) => {
+            width : ( new_width = 0 ) => {
+                // debugger
                 // check value
-                if( typeof(new_width) === "number"){
+                if( typeof(new_width) === "number" ){
 
                     this.#private.vars.old_width = this.#private.vars.width;
-                    this.#private.vars.width = new_width; // set new value if it valid
+                    this.#private.vars.width = new_width;
                     this.#private.dom.window.style.width = this.#private.vars.width + "px";
                     
-                    return true; // confirmation 
+                    return true; 
                 }
                 else { // mean invalid value
                     console.warn("[DESKTOPjs] new_x parameter must be number ")
-                    return false; // confirmation 
+                    return false; 
                 }
+
             },
+
             // set new width 
-            height : ( new_height = 0) => {
+            height : ( new_height = 0 ) => {
+
                 // check value
-                if( typeof(new_height) === "number"){
+                if( typeof(new_height) === "number" ){
 
                     this.#private.vars.old_height = this.#private.vars.height;
-                    this.#private.vars.height = new_height; // set new value if it valid
+                    this.#private.vars.height = new_height;
                     this.#private.dom.window.style.height = this.#private.vars.height + "px";
                     
-                    return true; // confirmation 
+                    return true;
                 }
                 else { // mean invalid value
                     console.warn("[DESKTOPjs] new_x parameter must be number ")
-                    return false; // confirmation 
+                    return false; 
                 }
+
             },
 
             // set new window title 
             title : ( new_title = "" ) => {
 
-                if(typeof(new_title) != "string"){
+                if(typeof(new_title) !== "string"){
                     console.error("[DESKTOPjs] new_title parameter must be string ");
                     return false;
                 }
@@ -877,9 +916,9 @@ export class window{
             // 
             maximize : ( e = null ) => {
                 // debugger
-
+                
                 // get task_bar if there's task_bar in desktop
-                let task_bar = this.#private.vars.parent_html.querySelector("#private.taskbar");
+                let task_bar = this.#private.vars.parent_html.querySelector("#desktop_taskbar");
                 
                 // save old "x y" and" width height" for minimize later 
                 this.#private.vars.old_x = this.#private.vars.x;
@@ -888,12 +927,10 @@ export class window{
                 this.#private.vars.old_width  = this.#private.vars.width;
                 this.#private.vars.old_height = this.#private.vars.height;
                 
-                this.#private.dom.window.style.cssText = `
-                    top    : 0px;
-                    left   : 0px;
-                    width  : 100%;
-                    height : calc( 100% - ${ Number.parseFloat( (task_bar) ? task_bar.clientHeight : 0 ) }px );
-                `;
+                this.#private.dom.window.style.top    = "0px";
+                this.#private.dom.window.style.left   = "0px";
+                this.#private.dom.window.style.width  = "100%";
+                this.#private.dom.window.style.height = `calc(100% - ${ task_bar.clientHeight }px)`;
 
                 // toggle to maximized
                 this.#private.vars.maxi_or_mini = true;
@@ -909,18 +946,17 @@ export class window{
             },
 
             minimize : ( e = null ) => {
-                debugger
+                // debugger
 
                 this.#private.vars.width  = this.#private.vars.old_width;
                 this.#private.vars.height = this.#private.vars.old_height;
                 
-                this.#private.dom.window.style.cssText = `
-                    top    : ${this.#private.y}px;
-                    left   : ${this.#private.x}px;
-                    width  : ${this.#private.width}px;
-                    height : ${this.#private.height}px;
-                `;
- 
+                this.#private.dom.window.style.top    = `${this.#private.vars.y}px`;
+                this.#private.dom.window.style.left   = `${this.#private.vars.x}px`;
+                this.#private.dom.window.style.width  = `${this.#private.vars.width}px`;
+                this.#private.dom.window.style.height = `${this.#private.vars.height}px`;
+
+
                 // set top z-index to this window
                 this.set.top_index();
 
