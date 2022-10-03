@@ -420,13 +420,13 @@ export class window{
             
             // when drag start
             this.#private.dom.top_bar.addEventListener("mousedown" , (e) => {
+                // debugger
                 e.preventDefault();
                 
-                // debugger
 
                 // activate drag boolean & miniminze
                 this.#private.env.drag.is_window_in_drag = true;
-
+                
                 // this window in drag event need to be in the top of all other windows 
                 // set index to the max_index + 1 
                         
@@ -446,27 +446,24 @@ export class window{
                 let mouse_x = e.clientX;
                 let mouse_y = e.clientY;
 
-                
+                let dist_x = mouse_x - this.#private.vars.x;
+                let dist_y = (this.#private.dom.top_bar.clientHeight/2);
+
                 // when window in drag 
                 document.onmousemove =  ( e ) => { 
-                    // debugger
+                    debugger
                     e.preventDefault();
                     
+                    this.#private.vars.maxi_or_mini = false;
+
                     if( this.#private.env.drag.is_window_in_drag ){ // if window in is really in drag
                     
-                        // calculate the new mouse position
-                        let new_mouse_x = mouse_x - e.clientX;
-                        let new_mouse_y = mouse_y - e.clientY;
-                        
                         // save current mouse x y 
                         mouse_x = e.clientX;
                         mouse_y = e.clientY;
                         
-                        // set new x and y to the window using setter function x and y in window.set
-                        this.set.width( this.#private.vars.old_width );
-                        this.set.height( this.#private.vars.old_height );
-                        this.set.x( mouse_x - (this.#private.vars.width/2));
-                        this.set.y( this.#private.vars.y - new_mouse_y );
+                        this.set.x( mouse_x - dist_x );
+                        this.set.y( mouse_y - dist_y); 
 
                         // if there's call_back_function for "drag" 
                         if(this.#private.env.drag.in.call_back_function){
@@ -525,26 +522,26 @@ export class window{
             })
 
 
-            let maximize_or_minimize = () => {
-                // debugger
+            let maximize_or_minimize = ( ) => {
+                debugger
 
                 if( this.#private.vars.maxi_or_mini ){
-                    this.set.minimize();
+                    this.set.minimize( );
                 }
                 else{
-                    this.set.maximize();
+                    this.set.maximize( );
                 }
 
             }
 
-            // "maximize minimize" click event on maximize button
+            // "maximize minimize" event on maximize_button
             if(this.#private.vars.maximize_allowed && this.#private.dom.maximize_button){
 
-                // set function to maximize button 
-                this.#private.dom.maximize_button.addEventListener("click" , maximize_or_minimize);
+                // maximize event when "maximize_button" get clicked 
+                this.#private.dom.maximize_button.addEventListener("click" , maximize_or_minimize );
                 
-                // set function to top_bar
-                this.#private.dom.top_bar.addEventListener("dblclick" , maximize_or_minimize);
+                // smaximize event when "top_bar" get double-click 
+                this.#private.dom.top_bar.addEventListener("dblclick" , maximize_or_minimize );
 
             }
 
@@ -579,6 +576,8 @@ export class window{
 
         this.#private.vars.height    = (typeof(height) == "number") ? height : 0;
         this.#private.vars.width     = (typeof(width) == "number") ? width : 0;
+        this.#private.vars.old_height = this.#private.vars.height;
+        this.#private.vars.old_width  = this.#private.vars.width;
 
         this.#private.vars.visible   = false;
         this.#private.vars.icon      = icon ? true : false;
@@ -789,6 +788,7 @@ export class window{
 
                 // check
                 if( typeof(new_x) == "number" ){
+                    this.#private.vars.old_x = this.#private.vars.x;
                     this.#private.vars.x = new_x; // set new value if it valid
                     this.#private.dom.window.style.left = this.#private.vars.x + "px";
                     return true; 
@@ -804,6 +804,7 @@ export class window{
             y : ( new_y = 0 ) => {
 
                 if( typeof(new_y) == "number" ){
+                    this.#private.vars.old_y = this.#private.vars.y;
                     this.#private.vars.y = new_y;
                     this.#private.dom.window.style.top = this.#private.vars.y + "px";
                     return true;
@@ -929,8 +930,8 @@ export class window{
                 
                 this.#private.dom.window.style.top    = "0px";
                 this.#private.dom.window.style.left   = "0px";
-                this.#private.dom.window.style.width  = "100%";
-                this.#private.dom.window.style.height = `calc(100% - ${ task_bar.clientHeight }px)`;
+                this.#private.dom.window.style.width  = this.#private.vars.parent_html.clientWidth + "px";
+                this.#private.dom.window.style.height = `${ this.#private.vars.parent_html.clientHeight - task_bar.clientHeight }px`;
 
                 // toggle to maximized
                 this.#private.vars.maxi_or_mini = true;
@@ -945,16 +946,21 @@ export class window{
                 } 
             },
 
-            minimize : ( e = null ) => {
+            minimize : ( pass_size = false ) => {
                 // debugger
 
+                // save old values
                 this.#private.vars.width  = this.#private.vars.old_width;
                 this.#private.vars.height = this.#private.vars.old_height;
-                
-                this.#private.dom.window.style.top    = `${this.#private.vars.y}px`;
-                this.#private.dom.window.style.left   = `${this.#private.vars.x}px`;
-                this.#private.dom.window.style.width  = `${this.#private.vars.width}px`;
-                this.#private.dom.window.style.height = `${this.#private.vars.height}px`;
+                this.#private.vars.old_x = this.#private.vars.x;
+                this.#private.vars.old_y = this.#private.vars.y;
+
+                if(!pass_size){
+                    this.#private.dom.window.style.top    = `${this.#private.vars.y}px`;
+                    this.#private.dom.window.style.left   = `${this.#private.vars.x}px`;
+                    this.#private.dom.window.style.width  = `${this.#private.vars.width}px`;
+                    this.#private.dom.window.style.height = `${this.#private.vars.height}px`;
+                }
 
 
                 // set top z-index to this window

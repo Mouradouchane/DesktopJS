@@ -34,7 +34,7 @@ export class desktop{
 
     
     // desktop_html_id : html element id "where this desktop should be"
-    constructor( desktop_html_id = null , desktop_background = null){
+    constructor( desktop_html_id = "" , desktop_background = null){
         // debugger
 
         // id must be string
@@ -42,7 +42,20 @@ export class desktop{
             
             // try to select target html element
             this.#private.desktop_html = document.querySelector(`#${desktop_html_id}`);
+       
+            // check if selection is "null"
+            if( !(this.#private.desktop_html) ){
 
+                // if not
+                // default selection will be the "html body"
+                this.#private.desktop_html = document.body;
+
+                // log warn and help
+                console.warn(`[DESKTOPjs] 'desktop html element id' you pass in not found or invalid , because parameter desktop_html_id is ${desktop_html_id}`);
+                console.info(`[DESKTOPjs] default selection will be the "html body" `);
+            
+            }
+            
             // setup desktop background
             if(desktop_background){
                 this.#private.background = desktop_background;
@@ -54,19 +67,7 @@ export class desktop{
                     background-position: center center; 
                 `;
             }
-            
-            // check if selection is "null"
-            if( !(this.#private.desktop_html) ){
-
-                // if not
-                // default selection will be the "html body"
-                this.#private.desktop_html = document.body;
-
-                // log warn and help
-                console.warn(`[DESKTOPjs] 'desktop html element id' you pass in not found or invalid , because parameter desktop_html_id is ${desktop_html_id}`);
-                console.info(`[DESKTOPjs] default selection will be the "html body"`);
-            
-            }
+     
 
         }
 
