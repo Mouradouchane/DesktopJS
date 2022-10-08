@@ -451,7 +451,7 @@ export class window{
 
                 // when window in drag 
                 document.onmousemove =  ( e ) => { 
-                    debugger
+                    // debugger
                     e.preventDefault();
                     
                     this.#private.vars.maxi_or_mini = false;
@@ -523,7 +523,7 @@ export class window{
 
 
             let maximize_or_minimize = ( ) => {
-                debugger
+                // debugger
 
                 if( this.#private.vars.maxi_or_mini ){
                     this.set.minimize( );
@@ -546,8 +546,85 @@ export class window{
             }
 
 
-            // end of "setup functionalities & events" ========================================
+            // setup resize in horizontal if it allowed  
+            if(this.#private.vars.resize_h){
 
+                /*
+                    ====================== setup resize for resize_top ======================
+                */
+
+                // when mouse move in resize process
+                const resize_t_mouse_move = ( evnt ) => {
+
+                    evnt.stopPropagation();
+
+                    // update window height & y position
+                    this.set.y( evnt.clientY );
+                    this.set.height( this.#private.vars.old_y - evnt.clientY + this.#private.vars.height );
+
+                };
+
+                // when click on resize_t element is end  
+                const resize_t_mouse_up = ( evnt ) => {
+
+                    // update window height & y position while resize is end 
+                    this.set.y( evnt.clientY );
+                    this.set.height( this.#private.vars.old_y - evnt.clientY + this.#private.vars.height );
+
+                    // remove move and up events 
+                    this.#private.vars.parent_html.removeEventListener("mousemove" , resize_t_mouse_move);
+                    this.#private.vars.parent_html.removeEventListener("mouseup" , resize_t_mouse_up);
+                    this.#private.dom.resize_t.removeEventListener("mouseup" , resize_t_mouse_up);
+
+                };
+
+                // when click on resize_t element is start  
+                this.#private.dom.resize_t.addEventListener("mousedown" , (e) => {
+
+                    // setup needed events for resize in top
+                    this.#private.vars.parent_html.addEventListener("mousemove", resize_t_mouse_move , e);
+                    this.#private.vars.parent_html.addEventListener("mouseup", resize_t_mouse_up , e);
+                    this.#private.dom.resize_t.addEventListener("mouseup", resize_t_mouse_up , e);
+
+                });
+
+                /*
+                    ====================== setup resize for resize_bottom ======================
+                */
+
+                const resize_b_mouse_move = (evnt) => {
+
+                    evnt.stopPropagation();
+
+                    // update window height
+                    this.set.height( evnt.clientY - this.#private.vars.y );
+
+                };                
+                  
+                const resize_b_mouse_up = (evnt) => {
+
+                    this.set.height( evnt.clientY - this.#private.vars.y );
+
+                    // remove move and up events 
+                    this.#private.vars.parent_html.removeEventListener("mousemove" , resize_b_mouse_move);
+                    this.#private.vars.parent_html.removeEventListener("mouseup" , resize_b_mouse_up);
+                    this.#private.dom.resize_b.removeEventListener("mouseup" , resize_b_mouse_up);
+
+                }
+
+                this.#private.dom.resize_b.addEventListener("mousedown" , (e) => {
+
+                    this.#private.vars.parent_html.addEventListener("mousemove" , resize_b_mouse_move , e)
+                    this.#private.vars.parent_html.addEventListener("mouseup" , resize_b_mouse_up , e);
+                    this.#private.dom.resize_b.addEventListener("mouseup" , resize_b_mouse_up , e);
+
+                });
+
+            } // ===== end of setup "resize in horizontal elements" ======
+
+            /*
+                =================== end of "setup functionalities & events" ====================
+            */
         }
 
 
@@ -847,8 +924,8 @@ export class window{
                     
                     return true;
                 }
-                else { // mean invalid value
-                    console.warn("[DESKTOPjs] new_x parameter must be number ")
+                else { // mean invalid value "new_height" parameter
+                    console.warn("[DESKTOPjs] new_x parameter must be number ");
                     return false; 
                 }
 
@@ -924,14 +1001,18 @@ export class window{
                 // save old "x y" and" width height" for minimize later 
                 this.#private.vars.old_x = this.#private.vars.x;
                 this.#private.vars.old_y = this.#private.vars.y;
+                this.#private.vars.x = 0;
+                this.#private.vars.y = 0;
 
                 this.#private.vars.old_width  = this.#private.vars.width;
                 this.#private.vars.old_height = this.#private.vars.height;
-                
+                this.#private.vars.width  = "100%";
+                this.#private.vars.height = this.#private.vars.parent_html.clientHeight - task_bar.clientHeight;
+
                 this.#private.dom.window.style.top    = "0px";
                 this.#private.dom.window.style.left   = "0px";
-                this.#private.dom.window.style.width  = this.#private.vars.parent_html.clientWidth + "px";
-                this.#private.dom.window.style.height = `${ this.#private.vars.parent_html.clientHeight - task_bar.clientHeight }px`;
+                this.#private.dom.window.style.width  = this.#private.vars.width;
+                this.#private.dom.window.style.height = `${ this.#private.vars.height }px`;
 
                 // toggle to maximized
                 this.#private.vars.maxi_or_mini = true;
@@ -952,8 +1033,8 @@ export class window{
                 // save old values
                 this.#private.vars.width  = this.#private.vars.old_width;
                 this.#private.vars.height = this.#private.vars.old_height;
-                this.#private.vars.old_x = this.#private.vars.x;
-                this.#private.vars.old_y = this.#private.vars.y;
+                this.#private.vars.x = this.#private.vars.old_x;
+                this.#private.vars.y = this.#private.vars.old_y;
 
                 if(!pass_size){
                     this.#private.dom.window.style.top    = `${this.#private.vars.y}px`;
