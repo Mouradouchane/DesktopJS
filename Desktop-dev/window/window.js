@@ -29,26 +29,7 @@ export class window{
     // windows index's for dealing with window : drag drop foucs blur ... 
     static #index = 0;
     static #max_index = 0;
-
-    // function convert STRING TEMPLATE to HTML OBJECT
-    static #template_to_HTML( window_html_as_string = "" ) {
-        
-        try{ // convert
-
-            let parser = new DOMParser();
-            let dom    = parser.parseFromString( window_html_as_string , 'text/html');
-            // first Elements it's main element it's self
-            return dom.body.firstElementChild;
-
-        }
-        catch(err) { // in case any error happen 
-
-            console.error(`[DESKTOPjs] parsing html error : ${err} .`);
-            throw null;
-            
-        }
-
-    }
+    static #min_size = 40;
 
     /*  ********* end of static area ************** */
 
@@ -546,39 +527,215 @@ export class window{
             }
 
 
-            // setup resize in horizontal if it allowed  
-            if(this.#private.vars.resize_h){
+            /*
+                ============ setup window resize functions ====================== 
+            */
 
-                /*
-                    ====================== setup resize for resize_top ======================
-                */
+            // "resize top" : when mouse move in resize process
+            const resize_t_mouse_move = ( evnt ) => {
 
-                // when mouse move in resize process
-                const resize_t_mouse_move = ( evnt ) => {
+                evnt.stopPropagation();
 
-                    evnt.stopPropagation();
-
-                    // update window height & y position
+                // update window height & y position
+                if( this.#private.vars.old_y - evnt.clientY + this.#private.vars.height > window.#min_size ){
                     this.set.y( evnt.clientY );
                     this.set.height( this.#private.vars.old_y - evnt.clientY + this.#private.vars.height );
+                }
 
-                };
 
-                // when click on resize_t element is end  
-                const resize_t_mouse_up = ( evnt ) => {
+            };
+            // "resize top" : 'mouse/click up' when resize process is end
+            const resize_t_mouse_up = ( evnt ) => {
 
-                    // update window height & y position while resize is end 
+                // update window height & y position even resize in the end 
+                if( this.#private.vars.old_y - evnt.clientY + this.#private.vars.height > window.#min_size ){
                     this.set.y( evnt.clientY );
                     this.set.height( this.#private.vars.old_y - evnt.clientY + this.#private.vars.height );
+                }
 
-                    // remove move and up events 
-                    this.#private.vars.parent_html.removeEventListener("mousemove" , resize_t_mouse_move);
-                    this.#private.vars.parent_html.removeEventListener("mouseup" , resize_t_mouse_up);
-                    this.#private.dom.resize_t.removeEventListener("mouseup" , resize_t_mouse_up);
+                // remove move and up events 
+                this.#private.vars.parent_html.removeEventListener("mousemove" , resize_t_mouse_move);
+                this.#private.vars.parent_html.removeEventListener("mouseup" , resize_t_mouse_up);
+                this.#private.dom.resize_t.removeEventListener("mouseup" , resize_t_mouse_up);
 
-                };
+            };
 
-                // when click on resize_t element is start  
+
+            // "resize bottom" :when mouse move in resize process
+            const resize_b_mouse_move = (evnt) => {
+
+                evnt.stopPropagation();
+
+                // update window height
+                if( evnt.clientY - this.#private.vars.y > window.#min_size ){
+                    this.set.height( evnt.clientY - this.#private.vars.y );
+                }
+                
+            };                
+            // "resize bottom" : 'mouse/click up' when resize process is end
+            const resize_b_mouse_up = (evnt) => {
+
+                if( evnt.clientY - this.#private.vars.y > window.#min_size ){
+                    this.set.height( evnt.clientY - this.#private.vars.y );
+                }
+
+                // remove move and up events 
+                this.#private.vars.parent_html.removeEventListener("mousemove" , resize_b_mouse_move);
+                this.#private.vars.parent_html.removeEventListener("mouseup" , resize_b_mouse_up);
+                this.#private.dom.resize_b.removeEventListener("mouseup" , resize_b_mouse_up);
+
+            };
+
+            const resize_l_mouse_move = (evnt) => {
+
+                evnt.stopPropagation();
+
+                // update window width & x position
+                if( this.#private.vars.old_x - evnt.clientX + this.#private.vars.width > window.#min_size){
+                    this.set.x( evnt.clientX );
+                    this.set.width( this.#private.vars.old_x - evnt.clientX + this.#private.vars.width );
+                }
+
+            };                
+            const resize_l_mouse_up = (evnt) => {
+
+                // update window width & x position
+                if( this.#private.vars.old_x - evnt.clientX + this.#private.vars.width > window.#min_size){
+                    this.set.x( evnt.clientX );
+                    this.set.width( this.#private.vars.old_x - evnt.clientX + this.#private.vars.width );
+                }
+                
+                // remove move and up events 
+                this.#private.vars.parent_html.removeEventListener("mousemove" , resize_l_mouse_move);
+                this.#private.vars.parent_html.removeEventListener("mouseup" , resize_l_mouse_up);
+                this.#private.dom.resize_l.removeEventListener("mouseup" , resize_l_mouse_up);
+
+            };
+
+            const resize_r_mouse_move = (evnt) => {
+
+                evnt.stopPropagation();
+
+                // update window width
+                if( evnt.clientX - this.#private.vars.x > window.#min_size ){
+                    this.set.width( evnt.clientX - this.#private.vars.x );
+                }
+
+            };                 
+            const resize_r_mouse_up = (evnt) => {
+
+                if( evnt.clientX - this.#private.vars.x > window.#min_size ){
+                    this.set.width( evnt.clientX - this.#private.vars.x );
+                }
+                //else this.set.width(window.#min_size);
+
+                // remove move and up events 
+                this.#private.vars.parent_html.removeEventListener("mousemove" , resize_r_mouse_move);
+                this.#private.vars.parent_html.removeEventListener("mouseup" , resize_r_mouse_up);
+                this.#private.dom.resize_r.removeEventListener("mouseup" , resize_r_mouse_up);
+
+            };
+
+            const resize_tl_mouse_move = (evnt) => {
+
+                evnt.stopPropagation();
+
+                // update window width & x position
+                if( this.#private.vars.old_x - evnt.clientX + this.#private.vars.width > window.#min_size){
+                    this.set.x( evnt.clientX );
+                    this.set.width( this.#private.vars.old_x - evnt.clientX + this.#private.vars.width );
+                }
+
+                // update window height & y position
+                if( this.#private.vars.old_y - evnt.clientY + this.#private.vars.height > window.#min_size ){
+                    this.set.y( evnt.clientY );
+                    this.set.height( this.#private.vars.old_y - evnt.clientY + this.#private.vars.height );
+                }
+
+            };
+            const resize_tl_mouse_up = (evnt) => {
+
+                this.#private.vars.parent_html.removeEventListener("mousemove",resize_tl_mouse_move);
+                this.#private.vars.parent_html.removeEventListener("mouseup",resize_tl_mouse_up);
+                this.#private.dom.resize_tl.removeEventListener("mouseup",resize_tl_mouse_up);
+
+            };
+
+            const resize_tr_mouse_move = (evnt) => {
+
+                evnt.stopPropagation();
+
+                // update window height & y position
+                if( this.#private.vars.old_y - evnt.clientY + this.#private.vars.height > window.#min_size ){
+                    this.set.y( evnt.clientY );
+                    this.set.height( this.#private.vars.old_y - evnt.clientY + this.#private.vars.height );
+                }
+
+                // update window width
+                if( evnt.clientX - this.#private.vars.x > window.#min_size ){
+                    this.set.width( evnt.clientX - this.#private.vars.x );
+                }
+
+
+            };
+            const resize_tr_mouse_up = (evnt) => {
+                this.#private.vars.parent_html.removeEventListener("mousemove" , resize_tr_mouse_move );
+                this.#private.vars.parent_html.removeEventListener("mouseup" , resize_tr_mouse_up );
+                this.#private.dom.resize_tl.removeEventListener("mouseup" , resize_tr_mouse_up );
+            };
+
+            const resize_bl_mouse_move = (evnt) => {
+
+                evnt.stopPropagation();
+
+                // update window width & x position
+                if( this.#private.vars.old_x - evnt.clientX + this.#private.vars.width > window.#min_size){
+                    this.set.x( evnt.clientX );
+                    this.set.width( this.#private.vars.old_x - evnt.clientX + this.#private.vars.width );
+                }
+
+                // update window height
+                if( evnt.clientY - this.#private.vars.y > window.#min_size ){
+                    this.set.height( evnt.clientY - this.#private.vars.y );
+                }
+
+            };
+            const resize_bl_mouse_up = (evnt) => {
+                this.#private.vars.parent_html.removeEventListener("mousemove" , resize_bl_mouse_move );
+                this.#private.vars.parent_html.removeEventListener("mouseup" , resize_bl_mouse_move );
+                this.#private.dom.resize_bl.removeEventListener("mouseup" , resize_bl_mouse_up );
+            };
+
+            const resize_br_mouse_move = (evnt) => {
+                
+                evnt.stopPropagation();
+
+                // update window height
+                if( evnt.clientY - this.#private.vars.y > window.#min_size ){
+                    this.set.height( evnt.clientY - this.#private.vars.y );
+                }
+
+                // update window width
+                if( evnt.clientX - this.#private.vars.x > window.#min_size ){
+                    this.set.width( evnt.clientX - this.#private.vars.x );
+                }
+
+            };
+            const resize_br_mouse_up = (evnt) => {
+                this.#private.vars.parent_html.removeEventListener("mousemove" , resize_br_mouse_move );
+                this.#private.vars.parent_html.removeEventListener("mouseup" , resize_br_mouse_move );
+                this.#private.dom.resize_br.removeEventListener("mouseup" , resize_br_mouse_up );
+            };
+            
+        /*
+            resize in vertical
+            setup resize events on "resize_t , resize_b" elements , if it allowed  
+        */
+            if(this.#private.vars.resize_v){
+
+                // setup "resize top" element 
+                
+                // "mouse down" : mean resize process is start
                 this.#private.dom.resize_t.addEventListener("mousedown" , (e) => {
 
                     // setup needed events for resize in top
@@ -588,30 +745,10 @@ export class window{
 
                 });
 
-                /*
-                    ====================== setup resize for resize_bottom ======================
-                */
 
-                const resize_b_mouse_move = (evnt) => {
+                // setup "resize top" element 
 
-                    evnt.stopPropagation();
-
-                    // update window height
-                    this.set.height( evnt.clientY - this.#private.vars.y );
-
-                };                
-                  
-                const resize_b_mouse_up = (evnt) => {
-
-                    this.set.height( evnt.clientY - this.#private.vars.y );
-
-                    // remove move and up events 
-                    this.#private.vars.parent_html.removeEventListener("mousemove" , resize_b_mouse_move);
-                    this.#private.vars.parent_html.removeEventListener("mouseup" , resize_b_mouse_up);
-                    this.#private.dom.resize_b.removeEventListener("mouseup" , resize_b_mouse_up);
-
-                }
-
+                // "mouse down" : mean resize process is start
                 this.#private.dom.resize_b.addEventListener("mousedown" , (e) => {
 
                     this.#private.vars.parent_html.addEventListener("mousemove" , resize_b_mouse_move , e)
@@ -620,16 +757,96 @@ export class window{
 
                 });
 
-            } // ===== end of setup "resize in horizontal elements" ======
+            
+            } // ========= end of setup vertical resize events =============
 
-            /*
-                =================== end of "setup functionalities & events" ====================
-            */
+
+
+        /*
+            resize in horizontal
+            setup resize events on "resize_l , resize_r" elements , if it allowed  
+        */
+            if(this.#private.vars.resize_h){
+
+                // setup "resize left" 
+                
+                // "mouse down" : mean resize process is start
+                this.#private.dom.resize_l.addEventListener("mousedown" , (e) => {
+
+                    this.#private.vars.parent_html.addEventListener("mousemove" , resize_l_mouse_move , e)
+                    this.#private.vars.parent_html.addEventListener("mouseup" , resize_l_mouse_up , e);
+                    this.#private.dom.resize_l.addEventListener("mouseup" , resize_l_mouse_up , e);
+
+                });
+
+
+                // setup "resize right" 
+
+                // "mouse down" : mean resize process is start
+                this.#private.dom.resize_r.addEventListener("mousedown" , (e) => {
+
+                    this.#private.vars.parent_html.addEventListener("mousemove" , resize_r_mouse_move , e)
+                    this.#private.vars.parent_html.addEventListener("mouseup" , resize_r_mouse_up , e);
+                    this.#private.dom.resize_r.addEventListener("mouseup" , resize_r_mouse_up , e);
+
+                });
+
+
+            } // ========= end of setup horizontal resize events =============
+
+
+        /*
+            resize in horizontal and vertical
+            setup resize events on "resize_tl , resize_tr , resize_bl , resize_br" elements , if it allowed  
+        */
+            if( this.#private.vars.resize_h &&  this.#private.vars.resize_v){
+                
+                // when resize process is start
+                this.#private.dom.resize_tl.addEventListener("mousedown" , (e) => {
+                    
+                    this.#private.vars.parent_html.addEventListener("mousemove" , resize_tl_mouse_move , e)
+                    this.#private.vars.parent_html.addEventListener("mouseup" , resize_tl_mouse_up , e);
+                    this.#private.dom.resize_tl.addEventListener("mouseup" , resize_tl_mouse_up , e);
+
+                });
+                
+                // when resize process is start
+                this.#private.dom.resize_tr.addEventListener("mousedown" , (e) => {
+                    
+                    this.#private.vars.parent_html.addEventListener("mousemove" , resize_tr_mouse_move , e)
+                    this.#private.vars.parent_html.addEventListener("mouseup" , resize_tr_mouse_up , e);
+                    this.#private.dom.resize_tl.addEventListener("mouseup" , resize_tr_mouse_up , e);
+
+                });
+                
+                // when resize process is start
+                this.#private.dom.resize_bl.addEventListener("mousedown" , (e) => {
+                    
+                    this.#private.vars.parent_html.addEventListener("mousemove" , resize_bl_mouse_move , e)
+                    this.#private.vars.parent_html.addEventListener("mouseup" , resize_bl_mouse_up , e);
+                    this.#private.dom.resize_bl.addEventListener("mouseup" , resize_bl_mouse_up , e);
+
+                });
+
+                // when resize process is start
+                this.#private.dom.resize_br.addEventListener("mousedown" , (e) => {
+                                    
+                    this.#private.vars.parent_html.addEventListener("mousemove" , resize_br_mouse_move , e)
+                    this.#private.vars.parent_html.addEventListener("mouseup" , resize_br_mouse_up , e);
+                    this.#private.dom.resize_br.addEventListener("mouseup" , resize_br_mouse_up , e);
+
+                });
+
+            } // ========= end of setup vertical and horizontal resize events =============
+                
         }
+        /*
+            =================== end of "setup functionalities & events" ====================
+        */
 
 
     }
-    /*  ********* end of private object ************** */
+    /*  ************ end of private object ************** */
 
 
 
