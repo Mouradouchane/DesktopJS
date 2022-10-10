@@ -97,7 +97,10 @@ export class window{
 
             focus: true,
             index: window.#index += 1,
-            
+
+            borders_index : 2,
+            container_index : 1,
+
             parent_html: null,
         },
 
@@ -218,7 +221,7 @@ export class window{
                 // setup mandatory elements attrs
                 this.#private.dom.top_bar.classList.add("top_bar");
                 // add drag cursor effect to top_bar
-                this.#private.dom.top_bar.style.cursor = "move"; 
+                this.#private.dom.top_bar.style.cursor = "grab"; 
 
                 this.#private.dom.container.classList.add("container");
 
@@ -314,7 +317,10 @@ export class window{
                 this.#private.dom.window.appendChild(
                     this.#private.dom.top_bar
                 );
-                
+            
+            // setup container
+                this.#private.dom.container.style.zIndex = this.#private.vars.container_index;
+
             // append container to window
                 this.#private.dom.window.appendChild(
                     this.#private.dom.container
@@ -322,7 +328,10 @@ export class window{
 
                 // setup resize in height 
                 this.#private.dom.resize_t.classList.add("resize_vertical","resize_top","resize");
+                this.#private.dom.resize_t.style.zIndex = this.#private.vars.borders_index;
+                
                 this.#private.dom.resize_b.classList.add("resize_vertical","resize_down","resize");
+                this.#private.dom.resize_b.style.zIndex = this.#private.vars.borders_index;
 
                 this.#private.dom.window.appendChild(
                     this.#private.dom.resize_t
@@ -335,7 +344,10 @@ export class window{
                 
                 // setup resize
                 this.#private.dom.resize_l.classList.add("resize","resize_horizontal","resize_left");
+                this.#private.dom.resize_l.style.zIndex = this.#private.vars.borders_index;
+
                 this.#private.dom.resize_r.classList.add("resize","resize_horizontal","resize_right");
+                this.#private.dom.resize_r.style.zIndex = this.#private.vars.borders_index;
                     
                 this.#private.dom.window.appendChild(
                     this.#private.dom.resize_l
@@ -345,14 +357,15 @@ export class window{
                     this.#private.dom.resize_r
                 );
                 
-                if( !(this.#private.vars.resize_h) ){
-                    this.#private.dom.resize_t.style.cursor = "default";
-                    this.#private.dom.resize_b.style.cursor = "default";
+
+                if( this.#private.vars.resize_v ){
+                    this.#private.dom.resize_t.style.cursor = "n-resize";
+                    this.#private.dom.resize_b.style.cursor = "n-resize";
                 }
 
-                if( !(this.#private.vars.resize_v) ){
-                    this.#private.dom.resize_l.style.cursor = "default";
-                    this.#private.dom.resize_r.style.cursor = "default";
+                if( this.#private.vars.resize_h ){
+                    this.#private.dom.resize_l.style.cursor = "w-resize";
+                    this.#private.dom.resize_r.style.cursor = "w-resize";
                 }
 
                 // setup h & w resize elements
@@ -361,6 +374,12 @@ export class window{
                 this.#private.dom.resize_tr.classList.add("resize","resize_corner","resize_tr");
                 this.#private.dom.resize_bl.classList.add("resize","resize_corner","resize_bl");
                 this.#private.dom.resize_br.classList.add("resize","resize_corner","resize_br");
+
+                this.#private.dom.resize_tl.style.zIndex = this.#private.vars.borders_index;
+                this.#private.dom.resize_tr.style.zIndex = this.#private.vars.borders_index;
+                this.#private.dom.resize_bl.style.zIndex = this.#private.vars.borders_index;
+                this.#private.dom.resize_br.style.zIndex = this.#private.vars.borders_index;
+
 
                 this.#private.dom.window.appendChild(
                     this.#private.dom.resize_tl
@@ -378,11 +397,11 @@ export class window{
                     this.#private.dom.resize_br
                 );
 
-                if( !(this.#private.vars.resize_h) || !(this.#private.vars.resize_v) ){
-                    this.#private.dom.resize_tl.style.cursor = "default";
-                    this.#private.dom.resize_tr.style.cursor = "default";
-                    this.#private.dom.resize_bl.style.cursor = "default";
-                    this.#private.dom.resize_br.style.cursor = "default";
+                if( this.#private.vars.resize_h && this.#private.vars.resize_v ){
+                    this.#private.dom.resize_tl.style.cursor = "se-resize";
+                    this.#private.dom.resize_tr.style.cursor = "ne-resize";
+                    this.#private.dom.resize_bl.style.cursor = "ne-resize";
+                    this.#private.dom.resize_br.style.cursor = "se-resize";
                 }
 
                 this.#private.vars.parent_html.appendChild( this.#private.dom.window );
@@ -404,9 +423,9 @@ export class window{
                 // debugger
                 e.preventDefault();
                 
-
                 // activate drag boolean & miniminze
                 this.#private.env.drag.is_window_in_drag = true;
+                this.#private.dom.top_bar.style.cursor = "grabbing"; 
                 
                 // this window in drag event need to be in the top of all other windows 
                 // set index to the max_index + 1 
@@ -434,6 +453,7 @@ export class window{
                 document.onmousemove =  ( e ) => { 
                     // debugger
                     e.preventDefault();
+                    minimize_css();
                     
                     this.#private.vars.maxi_or_mini = false;
 
@@ -467,6 +487,9 @@ export class window{
             // when drag end
             this.#private.dom.top_bar.addEventListener("mouseup", (e) => {
                 // debugger
+                
+                this.#private.dom.top_bar.style.cursor = "grab"; 
+                
                 // switch to drag off
                 this.#private.env.drag.is_window_in_drag  = false;
                 
@@ -503,14 +526,79 @@ export class window{
             })
 
 
-            let maximize_or_minimize = ( ) => {
+            let names = [
+                "resize_t","resize_b","resize_l","resize_r",
+                "resize_tl","resize_tr","resize_bl","resize_br"
+            ];
+            const minimize_css = () => {
+
+
+                for(let name of names){
+                    this.#private.dom[name].style.visibility = "visible";
+                    this.#private.dom[name].style.zIndex = "2";
+                }
+
+                if(this.#private.vars.resize_v){
+                    this.#private.dom.resize_t.style.cursor = "n-resize";
+                    this.#private.dom.resize_b.style.cursor = "n-resize";
+
+                }
+                if(this.#private.vars.resize_h){
+                    this.#private.dom.resize_l.style.cursor = "e-resize";
+                    this.#private.dom.resize_r.style.cursor = "e-resize";
+                }
+
+                if( this.#private.vars.resize_h && this.#private.vars.resize_v ){
+                    this.#private.dom.resize_tl.style.cursor = "se-resize";
+                    this.#private.dom.resize_tr.style.cursor = "ne-resize";
+                    this.#private.dom.resize_bl.style.cursor = "ne-resize";
+                    this.#private.dom.resize_br.style.cursor = "se-resize";
+                }
+
+                this.#private.dom.top_bar.style.width  = `calc(100% - ${(this.#private.dom.resize_l.clientWidth * 2)}px)`;
+                this.#private.dom.top_bar.style.left   = this.#private.dom.resize_l.clientWidth + "px";
+
+                this.#private.dom.container.style.zIndex = "1";
+                this.#private.dom.container.style.left   = this.#private.dom.resize_l.clientWidth +"px";
+                this.#private.dom.container.style.width  = `calc(100% - ${this.#private.dom.resize_l.clientWidth * 2}px)`;
+                this.#private.dom.container.style.height = `calc(100% - ${this.#private.dom.top_bar.clientHeight }px - ${this.#private.dom.resize_b.clientHeight}px)`;
+
+
+            };
+            const maximize_css = () => {
+
+                for(let name of names){
+                    this.#private.dom[name].style.visibility = "hidden";
+                    this.#private.dom[name].style.cursor = "default";
+                    this.#private.dom[name].style.zIndex = "1";
+                }
+
+                this.#private.dom.top_bar.style.left   = "0px";
+                this.#private.dom.top_bar.style.width  = "100%";
+
+                this.#private.dom.container.style.zIndex = "2";
+                this.#private.dom.container.style.left   = "0px";
+                this.#private.dom.container.style.width  = "100%";
+                this.#private.dom.container.style.height = `calc(100% - ${this.#private.dom.top_bar.clientHeight}px)`;
+                
+            }
+
+
+            const maximize_or_minimize = ( ) => {
                 // debugger
 
                 if( this.#private.vars.maxi_or_mini ){
+                    // minimize window and reset all happend css changed 
+
                     this.set.minimize( );
+                    minimize_css();
                 }
                 else{
+                    // maximize window and stop resize abilities if it's allowed
+
                     this.set.maximize( );
+                    maximize_css();
+                    
                 }
 
             }
@@ -521,7 +609,7 @@ export class window{
                 // maximize event when "maximize_button" get clicked 
                 this.#private.dom.maximize_button.addEventListener("click" , maximize_or_minimize );
                 
-                // smaximize event when "top_bar" get double-click 
+                // maximize event when "top_bar" get double-click 
                 this.#private.dom.top_bar.addEventListener("dblclick" , maximize_or_minimize );
 
             }
@@ -531,7 +619,8 @@ export class window{
                 ============ setup window resize functions ====================== 
             */
 
-            // "resize top" : when mouse move in resize process
+            // "resize top" 
+            // when mouse move in resize process
             const resize_t_mouse_move = ( evnt ) => {
 
                 evnt.stopPropagation();
@@ -544,7 +633,7 @@ export class window{
 
 
             };
-            // "resize top" : 'mouse/click up' when resize process is end
+            // when resize process is end
             const resize_t_mouse_up = ( evnt ) => {
 
                 // update window height & y position even resize in the end 
@@ -560,8 +649,8 @@ export class window{
 
             };
 
-
-            // "resize bottom" :when mouse move in resize process
+            // "resize bottom" 
+            // when mouse move in resize process
             const resize_b_mouse_move = (evnt) => {
 
                 evnt.stopPropagation();
@@ -571,8 +660,8 @@ export class window{
                     this.set.height( evnt.clientY - this.#private.vars.y );
                 }
                 
-            };                
-            // "resize bottom" : 'mouse/click up' when resize process is end
+            };   
+            // when resize process is end
             const resize_b_mouse_up = (evnt) => {
 
                 if( evnt.clientY - this.#private.vars.y > window.#min_size ){
@@ -586,6 +675,8 @@ export class window{
 
             };
 
+            // "resize left" 
+            // when mouse move in resize process
             const resize_l_mouse_move = (evnt) => {
 
                 evnt.stopPropagation();
@@ -596,7 +687,8 @@ export class window{
                     this.set.width( this.#private.vars.old_x - evnt.clientX + this.#private.vars.width );
                 }
 
-            };                
+            };    
+            // when resize process is end
             const resize_l_mouse_up = (evnt) => {
 
                 // update window width & x position
@@ -612,6 +704,8 @@ export class window{
 
             };
 
+            // "resize right" 
+            // when mouse move in resize process
             const resize_r_mouse_move = (evnt) => {
 
                 evnt.stopPropagation();
@@ -621,7 +715,8 @@ export class window{
                     this.set.width( evnt.clientX - this.#private.vars.x );
                 }
 
-            };                 
+            };  
+            // when resize process is end
             const resize_r_mouse_up = (evnt) => {
 
                 if( evnt.clientX - this.#private.vars.x > window.#min_size ){
@@ -636,6 +731,8 @@ export class window{
 
             };
 
+            // "resize top+left" 
+            // when mouse move in resize process
             const resize_tl_mouse_move = (evnt) => {
 
                 evnt.stopPropagation();
@@ -653,6 +750,7 @@ export class window{
                 }
 
             };
+            // when resize process is end
             const resize_tl_mouse_up = (evnt) => {
 
                 this.#private.vars.parent_html.removeEventListener("mousemove",resize_tl_mouse_move);
@@ -661,6 +759,8 @@ export class window{
 
             };
 
+            // "resize top+right" 
+            // when mouse move in resize process
             const resize_tr_mouse_move = (evnt) => {
 
                 evnt.stopPropagation();
@@ -678,12 +778,15 @@ export class window{
 
 
             };
+            // when resize process is end
             const resize_tr_mouse_up = (evnt) => {
                 this.#private.vars.parent_html.removeEventListener("mousemove" , resize_tr_mouse_move );
                 this.#private.vars.parent_html.removeEventListener("mouseup" , resize_tr_mouse_up );
                 this.#private.dom.resize_tl.removeEventListener("mouseup" , resize_tr_mouse_up );
             };
 
+            // "resize bottom+left" 
+            // when mouse move in resize process
             const resize_bl_mouse_move = (evnt) => {
 
                 evnt.stopPropagation();
@@ -700,12 +803,15 @@ export class window{
                 }
 
             };
+            // when resize process is end
             const resize_bl_mouse_up = (evnt) => {
                 this.#private.vars.parent_html.removeEventListener("mousemove" , resize_bl_mouse_move );
                 this.#private.vars.parent_html.removeEventListener("mouseup" , resize_bl_mouse_move );
                 this.#private.dom.resize_bl.removeEventListener("mouseup" , resize_bl_mouse_up );
             };
 
+            // "resize bottom+right" 
+            // when mouse move in resize process
             const resize_br_mouse_move = (evnt) => {
                 
                 evnt.stopPropagation();
@@ -721,6 +827,7 @@ export class window{
                 }
 
             };
+            // when resize process is end
             const resize_br_mouse_up = (evnt) => {
                 this.#private.vars.parent_html.removeEventListener("mousemove" , resize_br_mouse_move );
                 this.#private.vars.parent_html.removeEventListener("mouseup" , resize_br_mouse_move );
@@ -801,6 +908,7 @@ export class window{
         */
             if( this.#private.vars.resize_h &&  this.#private.vars.resize_v){
                 
+                // setup "top+left"
                 // when resize process is start
                 this.#private.dom.resize_tl.addEventListener("mousedown" , (e) => {
                     
@@ -810,6 +918,7 @@ export class window{
 
                 });
                 
+                // setup "top+right"
                 // when resize process is start
                 this.#private.dom.resize_tr.addEventListener("mousedown" , (e) => {
                     
@@ -819,6 +928,7 @@ export class window{
 
                 });
                 
+                // setup "bottom+left"
                 // when resize process is start
                 this.#private.dom.resize_bl.addEventListener("mousedown" , (e) => {
                     
@@ -828,6 +938,7 @@ export class window{
 
                 });
 
+                // setup "bottom+right"
                 // when resize process is start
                 this.#private.dom.resize_br.addEventListener("mousedown" , (e) => {
                                     
@@ -838,7 +949,8 @@ export class window{
                 });
 
             } // ========= end of setup vertical and horizontal resize events =============
-                
+         
+            
         }
         /*
             =================== end of "setup functionalities & events" ====================
@@ -847,7 +959,6 @@ export class window{
 
     }
     /*  ************ end of private object ************** */
-
 
 
 
