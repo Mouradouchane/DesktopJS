@@ -464,7 +464,7 @@ export class window{
                         mouse_y = e.clientY;
                         
                         this.set.x( mouse_x - dist_x );
-                        this.set.y( mouse_y - dist_y); 
+                        this.set.y( mouse_y - dist_y ); 
 
                         // if there's call_back_function for "drag" 
                         if(this.#private.env.drag.in.call_back_function){
@@ -678,11 +678,13 @@ export class window{
             // "resize left" 
             // when mouse move in resize process
             const resize_l_mouse_move = (evnt) => {
-
+                // debugger
                 evnt.stopPropagation();
-
+                
+                let width = this.#private.vars.width === "100%" ? this.#private.vars.parent_html.clientWidth : this.#private.vars.width;
+                
                 // update window width & x position
-                if( this.#private.vars.old_x - evnt.clientX + this.#private.vars.width > window.#min_size){
+                if( this.#private.vars.old_x - evnt.clientX + width > window.#min_size){
                     this.set.x( evnt.clientX );
                     this.set.width( this.#private.vars.old_x - evnt.clientX + this.#private.vars.width );
                 }
@@ -737,8 +739,10 @@ export class window{
 
                 evnt.stopPropagation();
 
+                let width = this.#private.vars.width === "100%" ? this.#private.vars.parent_html.clientWidth : this.#private.vars.width;
+                
                 // update window width & x position
-                if( this.#private.vars.old_x - evnt.clientX + this.#private.vars.width > window.#min_size){
+                if( this.#private.vars.old_x - evnt.clientX + width > window.#min_size){
                     this.set.x( evnt.clientX );
                     this.set.width( this.#private.vars.old_x - evnt.clientX + this.#private.vars.width );
                 }
@@ -791,8 +795,10 @@ export class window{
 
                 evnt.stopPropagation();
 
+                let width = this.#private.vars.width  === "100%" ? this.#private.vars.parent_html.clientWidth : this.#private.vars.width;
+
                 // update window width & x position
-                if( this.#private.vars.old_x - evnt.clientX + this.#private.vars.width > window.#min_size){
+                if( this.#private.vars.old_x - evnt.clientX + width > window.#min_size){
                     this.set.x( evnt.clientX );
                     this.set.width( this.#private.vars.old_x - evnt.clientX + this.#private.vars.width );
                 }
