@@ -106,6 +106,7 @@ export class window{
 
         // window html elements should be here
         dom : {
+
             window : document.createElement("div"),
             icon : document.createElement("img"),
             title : document.createElement("p"),
@@ -123,10 +124,12 @@ export class window{
             resize_tl : document.createElement("div"),
             resize_br : document.createElement("div"),
             resize_bl : document.createElement("div"),
+
         },
 
         // css of the elements should be here
         css : {
+
             window : null,
             title : null,
             icon : null,
@@ -138,10 +141,11 @@ export class window{
             resize_h : null,
             resize_v : null,
             full_body : null,
-        },
 
-        // sitting and callback's functions for the events should be here 
-        env : {
+        }, 
+
+        // where all callback's and it's args should be 
+        events : {
             
             // drag events : call_back's and arg's and ...
             drag : {
@@ -194,7 +198,68 @@ export class window{
                 call_back_function : null,
                 call_back_args : [],
             },
-        },
+
+            // all resize events callback's & arg's 
+            resize : {
+
+                // resize event in general
+                all : {
+                    call_back_function : null,
+                    call_back_args : [],
+                },
+
+                // only when resize in left 
+                left : {
+                    call_back_function : null,
+                    call_back_args : [],
+                },
+
+                // only when resize in right 
+                right : {
+                    call_back_function : null,
+                    call_back_args : [],
+                },
+
+                // only when resize in top 
+                top : {
+                    call_back_function : null,
+                    call_back_args : [],
+                },
+
+                // only when resize in bottom 
+                bottom : {
+                    call_back_function : null,
+                    call_back_args : [],
+                },
+
+                // only when resize in top + left
+                top_left : {
+                    call_back_function : null,
+                    call_back_args : [],
+                },
+
+                // only when resize in top + right 
+                top_right : {
+                    call_back_function : null,
+                    call_back_args : [],
+                },
+
+                // only when resize in bottom + left
+                bottom_left : {
+                    call_back_function : null,
+                    call_back_args : [],
+                },
+
+                // only when resize in bottom + right
+                bottom_right : {
+                    call_back_function : null,
+                    call_back_args : [],
+                },
+
+            }
+
+
+        }, // end of events object
 
         
         // function who gonna build window as html
@@ -424,16 +489,16 @@ export class window{
                 e.preventDefault();
                 
                 // activate drag boolean & miniminze
-                this.#private.env.drag.is_window_in_drag = true;
+                this.#private.events.drag.is_window_in_drag = true;
                 this.#private.dom.top_bar.style.cursor = "grabbing"; 
                 
                 // this window in drag event need to be in the top of all other windows 
                 // set index to the max_index + 1 
                         
                 // run only if call_back_function valid function and window not in foucs
-                if( typeof(this.#private.env.foucs.call_back_function) == "function" && this.is.foucs() == false ){
+                if( typeof(this.#private.events.foucs.call_back_function) == "function" && this.is.foucs() == false ){
                     // call event function
-                    this.#private.env.foucs.call_back_function( this , e , ...(this.#private.env.foucs.call_back_args) );
+                    this.#private.events.foucs.call_back_function( this , e , ...(this.#private.events.foucs.call_back_args) );
                 }
 
                 // check index & update it to max_index if needed
@@ -457,7 +522,7 @@ export class window{
                     
                     this.#private.vars.maxi_or_mini = false;
 
-                    if( this.#private.env.drag.is_window_in_drag ){ // if window in is really in drag
+                    if( this.#private.events.drag.is_window_in_drag ){ // if window in is really in drag
                     
                         // save current mouse x y 
                         mouse_x = e.clientX;
@@ -467,9 +532,9 @@ export class window{
                         this.set.y( mouse_y - dist_y ); 
 
                         // if there's call_back_function for "drag" 
-                        if(this.#private.env.drag.in.call_back_function){
+                        if(this.#private.events.drag.in.call_back_function){
                             // run it and pass (window , event , and some optional args)
-                            this.#private.env.drag.in.call_back_function( this , e , ...(this.#private.env.drag.in.call_back_args) )
+                            this.#private.events.drag.in.call_back_function( this , e , ...(this.#private.events.drag.in.call_back_args) )
                         }
 
                     }
@@ -477,9 +542,9 @@ export class window{
                 };
         
                 // if there's call_back_function for "drag_start" 
-                if(this.#private.env.drag.start.call_back_function){
+                if(this.#private.events.drag.start.call_back_function){
                     // run it and pass (window , event , and some optional args , if available)
-                    this.#private.env.drag.start.call_back_function(this , e , ...(this.#private.env.drag.start.call_back_args) )
+                    this.#private.events.drag.start.call_back_function(this , e , ...(this.#private.events.drag.start.call_back_args) )
                 } 
 
             });
@@ -491,15 +556,15 @@ export class window{
                 this.#private.dom.top_bar.style.cursor = "grab"; 
                 
                 // switch to drag off
-                this.#private.env.drag.is_window_in_drag  = false;
+                this.#private.events.drag.is_window_in_drag  = false;
                 
                 // drop window
                 document.onmousemove = null;
 
                 // if there's call_back_function for "drag_end" 
-                if( this.#private.env.drag.end.call_back_function ){
+                if( this.#private.events.drag.end.call_back_function ){
                     // run it and pass (window , event , and some optional args , if available)
-                    this.#private.env.drag.end.call_back_function(this , e , ...(this.#private.env.drag.end.call_back_args) )
+                    this.#private.events.drag.end.call_back_function(this , e , ...(this.#private.events.drag.end.call_back_args) )
                 } 
 
             });
@@ -510,9 +575,9 @@ export class window{
                 //debugger
                 
                 // run only if call_back_function valid & window not in foucs
-                if( this.#private.env.foucs.call_back_function && this.is.blur() ){
+                if( this.#private.events.foucs.call_back_function && this.is.blur() ){
                     // call event function
-                    this.#private.env.foucs.call_back_function( this , e , ...(this.#private.env.foucs.call_back_args) );
+                    this.#private.events.foucs.call_back_function( this , e , ...(this.#private.events.foucs.call_back_args) );
                 }
 
                 // this window in drag event need to be in the top of all other windows 
@@ -616,7 +681,7 @@ export class window{
 
 
             /*
-                ============ setup window resize functions ====================== 
+                ============ setup window resize functions and events ================ 
             */
 
             // "resize top" 
@@ -631,8 +696,19 @@ export class window{
                     this.set.height( this.#private.vars.old_y - evnt.clientY + this.#private.vars.height );
                 }
 
+                /* 
+                    execute callback's if available
+                */
+                if( typeof(this.#private.events.resize.all.call_back_function) === "function" ){
+                    this.#private.events.resize.all.call_back_function( this , evnt , ...(this.#private.events.resize.all.call_back_args) );
+                }
+
+                if( typeof(this.#private.events.resize.top.call_back_function) === "function" ){
+                    this.#private.events.resize.top.call_back_function( this , evnt , ...(this.#private.events.resize.top.call_back_args) );
+                }
 
             };
+
             // when resize process is end
             const resize_t_mouse_up = ( evnt ) => {
 
@@ -660,6 +736,16 @@ export class window{
                     this.set.height( evnt.clientY - this.#private.vars.y );
                 }
                 
+                /* 
+                    execute callback's if available
+                */
+                if( typeof(this.#private.events.resize.all.call_back_function) === "function" ){
+                    this.#private.events.resize.all.call_back_function( this , evnt , ...(this.#private.events.resize.all.call_back_args) );
+                }
+
+                if( typeof(this.#private.events.resize.bottom.call_back_function) === "function" ){
+                    this.#private.events.resize.bottom.call_back_function( this , evnt , ...(this.#private.events.resize.bottom.call_back_args) );
+                }
             };   
             // when resize process is end
             const resize_b_mouse_up = (evnt) => {
@@ -689,6 +775,16 @@ export class window{
                     this.set.width( this.#private.vars.old_x - evnt.clientX + this.#private.vars.width );
                 }
 
+                /* 
+                    execute callback's if available
+                */
+                if( typeof(this.#private.events.resize.all.call_back_function) === "function" ){
+                    this.#private.events.resize.all.call_back_function( this , evnt , ...(this.#private.events.resize.all.call_back_args) );
+                }
+
+                if( typeof(this.#private.events.resize.left.call_back_function) === "function" ){
+                    this.#private.events.resize.left.call_back_function( this , evnt , ...(this.#private.events.resize.left.call_back_args) );
+                }
             };    
             // when resize process is end
             const resize_l_mouse_up = (evnt) => {
@@ -717,6 +813,16 @@ export class window{
                     this.set.width( evnt.clientX - this.#private.vars.x );
                 }
 
+                /* 
+                    execute callback's if available
+                */
+                if( typeof(this.#private.events.resize.all.call_back_function) === "function" ){
+                    this.#private.events.resize.all.call_back_function( this , evnt , ...(this.#private.events.resize.all.call_back_args) );
+                }
+
+                if( typeof(this.#private.events.resize.right.call_back_function) === "function" ){
+                    this.#private.events.resize.right.call_back_function( this , evnt , ...(this.#private.events.resize.right.call_back_args) );
+                }
             };  
             // when resize process is end
             const resize_r_mouse_up = (evnt) => {
@@ -1020,7 +1126,7 @@ export class window{
             
             // for check if this window in drag right now or not  
             in_drag : () => {
-                return this.#private.env.drag.is_window_in_drag;
+                return this.#private.events.drag.is_window_in_drag;
             },
 
             open : () => {
@@ -1062,8 +1168,8 @@ export class window{
                 if(typeof(call_back_function) == "function"){
                                     
                     // save call_back_function and it's arguments
-                    this.#private.env.drag.start.call_back_function = call_back_function;
-                    this.#private.env.drag.start.call_back_args = args;
+                    this.#private.events.drag.start.call_back_function = call_back_function;
+                    this.#private.events.drag.start.call_back_args = args;
 
                 }
                 else{ // mean call_back_function is not function 
@@ -1079,8 +1185,8 @@ export class window{
                 if(typeof(call_back_function) == "function"){
                     
                     // save call_back_function and it's arguments
-                    this.#private.env.drag.in.call_back_function = call_back_function;
-                    this.#private.env.drag.in.call_back_args = args;
+                    this.#private.events.drag.in.call_back_function = call_back_function;
+                    this.#private.events.drag.in.call_back_args = args;
 
                 }
                 else{ // mean call_back_function is not function 
@@ -1095,8 +1201,8 @@ export class window{
                 if(typeof(call_back_function) == "function"){
                     
                     // save call_back_function and it's arguments
-                    this.#private.env.drag.end.call_back_function = call_back_function;
-                    this.#private.env.drag.end.call_back_args = args;
+                    this.#private.events.drag.end.call_back_function = call_back_function;
+                    this.#private.events.drag.end.call_back_args = args;
 
                 }
                 else{ // mean call_back_function is not function 
@@ -1111,8 +1217,8 @@ export class window{
                 if(typeof(call_back_function) == "function"){
                                     
                     // save call_back_function and it's arguments
-                    this.#private.env.foucs.call_back_function = call_back_function;
-                    this.#private.env.foucs.call_back_args = args;
+                    this.#private.events.foucs.call_back_function = call_back_function;
+                    this.#private.events.foucs.call_back_args = args;
 
                 }
                 else{ // mean call_back_function is not function 
@@ -1127,8 +1233,8 @@ export class window{
                 if(typeof(call_back_function) == "function"){
                                                                     
                     // save call_back_function and it's arguments
-                    this.#private.env.close.call_back_function = call_back_function;
-                    this.#private.env.close.call_back_args = args;
+                    this.#private.events.close.call_back_function = call_back_function;
+                    this.#private.events.close.call_back_args = args;
 
                 }
                 else{ // mean call_back_function is not function 
@@ -1143,8 +1249,8 @@ export class window{
                 if(typeof(call_back_function) == "function"){
                                                                     
                     // save call_back_function and it's arguments
-                    this.#private.env.open.call_back_function = call_back_function;
-                    this.#private.env.open.call_back_args = args;
+                    this.#private.events.open.call_back_function = call_back_function;
+                    this.#private.events.open.call_back_args = args;
 
                 }
                 else{ // mean call_back_function is not function 
@@ -1160,8 +1266,8 @@ export class window{
                 if(typeof(call_back_function) == "function"){
                                                     
                     // save call_back_function and it's arguments
-                    this.#private.env.maximize.call_back_function = call_back_function;
-                    this.#private.env.maximize.call_back_args = args;
+                    this.#private.events.maximize.call_back_function = call_back_function;
+                    this.#private.events.maximize.call_back_args = args;
 
                 }
                 else{ // mean call_back_function is not function 
@@ -1178,17 +1284,154 @@ export class window{
                 if(typeof(call_back_function) == "function"){
                                                                     
                     // save call_back_function and it's arguments
-                    this.#private.env.minimize.call_back_function = call_back_function;
-                    this.#private.env.minimize.call_back_args = args;
+                    this.#private.events.minimize.call_back_function = call_back_function;
+                    this.#private.events.minimize.call_back_args = args;
 
                 }
                 else{ // mean call_back_function is not function 
                     console.error("[DESKTOPjs] parameter 'call_back_function' must be function");
                 }
-            }
+            },
 
+
+            // sub events in resize event
+            resize : { 
+                
+                // general resize event
+                all : ( call_back_function = null , ...args ) => {
+
+                    // call_back_function must be function
+                    if(typeof(call_back_function) == "function"){
+                                                                        
+                        // save call_back_function and it's arguments
+                        this.#private.events.resize.all.call_back_function = call_back_function;
+                        this.#private.events.resize.all.call_back_args = args;
+
+                    }
+                    else{ // mean call_back_function is not function 
+                        console.error("[DESKTOPjs] parameter 'call_back_function' must be function");
+                    }
+
+                },
+
+                left : ( call_back_function = null , ...args ) => {
+
+                    if(typeof(call_back_function) == "function"){
+                                                                        
+                        this.#private.events.resize.left.call_back_function = call_back_function;
+                        this.#private.events.resize.left.call_back_args = args;
+
+                    }
+                    else{ 
+                        console.error("[DESKTOPjs] parameter 'call_back_function' must be function");
+                    }
+
+                },
+
+                right : ( call_back_function = null , ...args ) => {
+
+                    if(typeof(call_back_function) == "function"){
+                                                                        
+                        this.#private.events.resize.right.call_back_function = call_back_function;
+                        this.#private.events.resize.right.call_back_args = args;
+
+                    }
+                    else{ 
+                        console.error("[DESKTOPjs] parameter 'call_back_function' must be function");
+                    }
+
+                },
+
+                top : ( call_back_function = null , ...args ) => {
+
+                    if(typeof(call_back_function) == "function"){
+                                                                        
+                        this.#private.events.resize.top.call_back_function = call_back_function;
+                        this.#private.events.resize.top.call_back_args = args;
+
+                    }
+                    else{ 
+                        console.error("[DESKTOPjs] parameter 'call_back_function' must be function");
+                    }
+
+                },
+
+                bottom : ( call_back_function = null , ...args ) => {
+
+                    if(typeof(call_back_function) == "function"){
+                                                                        
+                        this.#private.events.resize.bottom.call_back_function = call_back_function;
+                        this.#private.events.resize.bottom.call_back_args = args;
+
+                    }
+                    else{ 
+                        console.error("[DESKTOPjs] parameter 'call_back_function' must be function");
+                    }
+
+                },
+        
+                top_left : ( call_back_function = null , ...args ) => {
+
+                    if(typeof(call_back_function) == "function"){
+                                                                        
+                        this.#private.events.resize.top_left.call_back_function = call_back_function;
+                        this.#private.events.resize.top_left.call_back_args = args;
+
+                    }
+                    else{ 
+                        console.error("[DESKTOPjs] parameter 'call_back_function' must be function");
+                    }
+
+                },
+
+                top_right : ( call_back_function = null , ...args ) => {
+
+                    if(typeof(call_back_function) == "function"){
+                                                                        
+                        this.#private.events.resize.top_right.call_back_function = call_back_function;
+                        this.#private.events.resize.top_right.call_back_args = args;
+
+                    }
+                    else{ 
+                        console.error("[DESKTOPjs] parameter 'call_back_function' must be function");
+                    }
+
+                },
+
+                bottom_left : ( call_back_function = null , ...args ) => {
+
+                    if(typeof(call_back_function) == "function"){
+                                                                        
+                        this.#private.events.resize.bottom_left.call_back_function = call_back_function;
+                        this.#private.events.resize.bottom_left.call_back_args = args;
+
+                    }
+                    else{ 
+                        console.error("[DESKTOPjs] parameter 'call_back_function' must be function");
+                    }
+
+                },
+
+                bottom_right : ( call_back_function = null , ...args ) => {
+
+                    if(typeof(call_back_function) == "function"){
+                                                                        
+                        this.#private.events.resize.bottom_right.call_back_function = call_back_function;
+                        this.#private.events.resize.bottom_right.call_back_args = args;
+
+                    }
+                    else{ 
+                        console.error("[DESKTOPjs] parameter 'call_back_function' must be function");
+                    }
+
+                },
+
+            }, // end of resize sub events object
             
-        }
+            
+            
+
+        } // end of on object
 
 
         // object contain all abilities for modify existing values
@@ -1354,9 +1597,9 @@ export class window{
                 this.set.top_index();
 
                 // if there's call_back_function for maximize event , run it
-                if( typeof(this.#private.env.maximize.call_back_function) === "function" ){
+                if( typeof(this.#private.events.maximize.call_back_function) === "function" ){
 
-                    this.#private.env.maximize.call_back_function( this , e , ...this.#private.env.maximize.call_back_args );
+                    this.#private.events.maximize.call_back_function( this , e , ...this.#private.events.maximize.call_back_args );
 
                 } 
             },
@@ -1385,9 +1628,9 @@ export class window{
                 this.#private.vars.maxi_or_mini = false;
                 
                 // if there's call_back_function for maximize event , run it
-                if( typeof(this.#private.env.minimize.call_back_function) === "function" ){
+                if( typeof(this.#private.events.minimize.call_back_function) === "function" ){
 
-                    this.#private.env.minimize.call_back_function( this , e , ...this.#private.env.minimize.call_back_args );
+                    this.#private.events.minimize.call_back_function( this , e , ...this.#private.events.minimize.call_back_args );
 
                 } 
 
@@ -1467,9 +1710,9 @@ export class window{
             this.set.visibility(true);
 
             
-            if( typeof(this.#private.env.open.call_back_function) === "function"){
-                this.#private.env.open.call_back_function(
-                    this , ...(this.#private.env.open.call_back_args)
+            if( typeof(this.#private.events.open.call_back_function) === "function"){
+                this.#private.events.open.call_back_function(
+                    this , ...(this.#private.events.open.call_back_args)
                 )
             }
             
@@ -1493,9 +1736,9 @@ export class window{
             // make window visible 'open'
             this.set.visibility(false);
 
-            if( typeof(this.#private.env.close.call_back_function) === "function"){
-                this.#private.env.close.call_back_function(
-                    this , ...(this.#private.env.close.call_back_args)
+            if( typeof(this.#private.events.close.call_back_function) === "function"){
+                this.#private.events.close.call_back_function(
+                    this , ...(this.#private.events.close.call_back_args)
                 )
             }
 
