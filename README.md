@@ -1,9 +1,6 @@
 <h1> DesktopJS </h1>
 
-<img src="https://img.shields.io/github/license/Mouradouchane/DesktopJS">
-<img src="https://img.shields.io/badge/status-stable-0?color=lightgreen">
-<img src="https://img.shields.io/github/issues/Mouradouchane/DesktopJS">
-<img src="https://img.shields.io/badge/version-Beta-cyan">
+<img src="https://img.shields.io/github/license/Mouradouchane/DesktopJS"> <img src="https://img.shields.io/badge/status-stable-0?color=lightgreen"> <img src="https://img.shields.io/github/issues/Mouradouchane/DesktopJS"> <img src="https://img.shields.io/badge/version-Beta-cyan">
 
 <br>
 <h1> About </h1>
