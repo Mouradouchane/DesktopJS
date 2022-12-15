@@ -8,6 +8,7 @@ export class element {
         children : [],
 
         html : document.createElement("div"),
+        allow_context_menu : true,
         css  : { }, // css as object
 
         x : 0, y : 0 , old_x : 0 , old_y : 0 ,
@@ -61,11 +62,15 @@ export class element {
            console.error("on.click :", "parameter 'call_back_function' must to be function"); 
            
         },
+
         click_right : ( call_back_function , ...call_back_args ) => { 
 
             if( this.#callbacks.set_callback("click_right", call_back_function , ...call_back_args) ){
 
                 this.#props.html.addEventListener("contextmenu" , (event) => {
+
+                    if( !(this.#props.allow_context_menu) ) event.preventDefault();
+
                     this.#callbacks.click_right.call_back_function( this , event , ...( this.#callbacks.click_right.call_back_args));
                 });
 
@@ -140,9 +145,22 @@ export class element {
 
     set = {
 
-        // we need => html , css 
-    };
 
+        context_item  : () => { }, // need work later
+        context_items : () => { }, // need work later
+
+        // we need => "html , css" setters logic 
+    };
+    
+    context_menu = ( allow_context_menu = true ) => {
+
+        if( typeof(allow_context_menu) != "boolean" ) {
+            // need warn
+            console.warn("element.context_menu :" , "parameter allow_context_menu must to be 'boolean'" );
+        }
+        else this.#props.allow_context_menu = Boolean(allow_context_menu);
+
+    }
 
     add = {
 
