@@ -19,9 +19,8 @@ export class element {
         resizable : false,
         draggable : false,
 
-        id : null ,
-        index : 0 , 
-        title : "title",
+        id : undefined ,
+        z_index : 0 , 
         text  : "text",
 
     };
@@ -145,11 +144,125 @@ export class element {
 
     set = {
 
+        // set element x position
+        x : ( new_x = 0 , unit = "px") => {
+
+            if( typeof(new_x) === "number" ){
+
+                this.#props.old_x = this.#props.x;
+                this.#props.x = new_x; 
+
+                // set x position to html element
+                this.#props.html.style.left = this.#props.x + unit;
+
+                return true; 
+            }
+            else { 
+                // need warn
+                console.warn("set.x :" , "parameter new_x must to be number");
+                return false; 
+            }
+
+        },
+
+        // set element y position
+        y : ( new_y = 0 , unit = "px") => {
+
+            if( typeof(new_y) === "number" ){
+
+                this.#props.old_y = this.#props.y;
+                this.#props.y = new_y; 
+
+                this.#props.html.style.top = this.#props.y + unit;
+
+                return true;
+            }
+            else { 
+                // need warn
+                console.warn("set.y :" , "parameter new_y must to be number");
+                return false; 
+            }
+
+        },
+
+        // set element width 
+        width : ( new_width = 0 , unit = "px" ) => {
+
+            if( typeof(new_width) === "number" ){
+
+                this.#props.old_width = this.#props.width;
+                this.#props.width = new_width;
+                this.#props.html.style.width = this.#props.width + unit;
+                
+                return true; 
+            }
+            else { 
+                // need warn
+                console.warn("set.width" , "parameter new_width must to be number");
+                return false; 
+            }
+
+        },
+
+        // set element height 
+        height : ( new_height = 0 , unit = "px" ) => {
+
+            if( typeof(new_height) === "number" ){
+
+                this.#props.old_height = this.#props.height;
+                this.#props.height = new_height;
+                this.#props.html.style.height = this.#props.height + unit;
+                
+                return true;
+            }
+            else { 
+                // need warn
+                console.warn("[DESKTOPjs] new_x parameter must be number");
+                return false; 
+            }
+
+        },
+
+        // set element visiblity
+        visibility : ( is_visible = true ) => {
+            
+            this.#props.visible = ( is_visible ? true : false );
+            this.#props.html.style.visibility = (this.#props.visible) ? "visible" : "hidden";
+
+        },
+
+        // set element z-index 
+        z_index : ( z_index_value = 1 ) => {
+
+            if( typeof(z_index_value) === "number" ){
+
+                this.#props.z_index = z_index_value;
+                this.#props.html.style.zIndex = this.#props.z_index;
+                
+                return true;
+            }
+            else {
+                // need warn
+                console.warn("set.z_index :" , "parameter z_index_value must to be number");
+                return false;
+            }
+
+        },
+
+        // set elemnt text content 
+        text : ( new_text = "") => {
+
+            this.#props.text = new_text;
+            this.#props.html.textContent = new_text;
+
+        },
+       
+        
 
         context_item  : () => { }, // need work later
         context_items : () => { }, // need work later
 
-        // we need => "html , css" setters logic 
+        // need => "html & css" setters ! 
     };
     
     context_menu = ( allow_context_menu = true ) => {
@@ -192,14 +305,13 @@ export class element {
     }
 
     constructor(
-        id = null , title = "" , text = "" , x = 0 , y = 0 , width = 0 , height = 0 , 
+        id = undefined , text = "" , x = 0 , y = 0 , width = 0 , height = 0 , 
         visible = true , draggable = false , resizable = false  
     ){
 
         // save values 
 
         this.#props.id    = (typeof(id)    == "string") ? id : undefined;
-        this.#props.title = (typeof(title) == "string") ? title : undefined;
         this.#props.text  = (typeof(text)  == "string") ? text : "";
 
         this.#props.x = (typeof(x) == "number") ? x : 0;
@@ -231,9 +343,9 @@ export class element {
         // setup getter's functions 
 
         const getters_functions = [
-            "title","id","text","x","y","old_x","old_y",
+            "id","text","x","y","old_x","old_y",
             "width","old_width","height","old_height",
-            "resizable","draggable","visible","index"
+            "resizable","draggable","visible","z_index"
         ];
 
         for( const name of getters_functions ){
@@ -245,39 +357,14 @@ export class element {
         }
 
 
-        // setup setter's functions 
-
-        const setters_functions = [
-           // function name , parameter type
-            {name : "title" , type : "string"},
-            {name : "text"  , type : "string"},
-            {name : "x"     , type : "number"},
-            {name : "y"     , type : "number"},
-            {name : "width" , type : "number"},
-            {name : "height", type : "number"},
-            {name : "index" , type : "number"},
-            {name : "visible", type : "boolean"},
-            {name : "draggable", type : "boolean"},
-            {name : "resizable", type : "boolean"},
-        ];
-
-        for( const fn of setters_functions ){
-
-            this.set[fn.name] = ( new_value ) => {
-                
-                if( typeof(new_value) != fn.type ) console.warn( "set."+fn.name ,": parameter must to be =>" , fn.type ); // need warn from model
-                else this.#props[fn.name] = new_value;
-
-            } 
-
-        }
-
+   
         // just for test !!!
         this.#props.html.textContent = text;
         this.#props.html.id = id;
         document.body.append(this.#props.html);
 
+
     } // end of constructor
 
 
-}
+} // end of class element
