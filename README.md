@@ -9,7 +9,9 @@ DesktopJS it's a javascript library for building virtual desktop environment as 
 
 <br>
 <h1> Preview </h1>
-<video src="./previews/demo.avi"></video>
+<video src="./previews/demo.avi">
+<source src="">
+</video>
 <img src="./previews/ss1.png">
 
 <br>
