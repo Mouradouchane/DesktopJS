@@ -2,16 +2,13 @@
 
 <img src="https://img.shields.io/github/license/Mouradouchane/DesktopJS"> <img src="https://img.shields.io/badge/status-stable-0?color=lightgreen"> <img src="https://img.shields.io/github/issues/Mouradouchane/DesktopJS"> <img src="https://img.shields.io/badge/version-Beta-cyan">
 
-<br>
-<h1> About </h1>
-
 DesktopJS it's a javascript library for building virtual desktop environment as a web-app .
 
 <br>
 <h1> Preview </h1>
-<video src="./previews/demo.avi">
-<source src="">
-</video>
+
+<video src="https://user-images.githubusercontent.com/34870188/208255249-af31d14a-f296-4969-95e1-c86e0bb3971a.mp4" autoplay controls loop> </video>
+
 <img src="./previews/ss1.png">
 
 <br>
