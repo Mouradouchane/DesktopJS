@@ -4,7 +4,6 @@
 
 DesktopJS it's a javascript library for building virtual desktop environment as a web-app .
 
-<br>
 <h1> Preview </h1>
 
 <video src="https://user-images.githubusercontent.com/34870188/208255249-af31d14a-f296-4969-95e1-c86e0bb3971a.mp4" autoplay controls loop> </video>
